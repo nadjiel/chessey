@@ -4,7 +4,6 @@ Continuar trabalhando no procedimento perguntarJogada()
 Fazer casos nos quais outras pecas foram escolhidas
 Fazer os eventos especiais, tipo xeque, roque
 Elaborar se as pecas escolhidas nao sao torres estao livres ou presas, tal como se um movimento escolhido para ser realizado com elas seria possível
-Ajeitar erro de deixar pecas passarem por outras
 Adicionar o parametro de medicao de uma peca estar livre ou nao de ela estar na borda do tabuleiro
 */
 
@@ -49,6 +48,10 @@ void iniciarTabuleiro(peca tabuleiro[ORDEM][ORDEM]){
 	tabuleiro[3][3].jogador = '2';
 	tabuleiro[4][4].nome = TORRE;
 	tabuleiro[4][4].jogador = '1';
+	tabuleiro[4][1].nome = TORRE;
+	tabuleiro[4][1].jogador = '1';
+	tabuleiro[4][2].nome = TORRE;
+	tabuleiro[4][2].jogador = '1';
 	/*
 	tabuleiro[0][0].nome = TORRE;
 	tabuleiro[0][7].nome = TORRE;
@@ -167,7 +170,7 @@ char verifVez(int turno){
 	}
 }
 
-int enderPartidaDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TAM_ENDER], int j, int k){
+int enderPartidaDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int j, int k){
 	if(tabuleiro[j][k].jogador == vez){
 		return TRUE;
 	}
@@ -176,7 +179,7 @@ int enderPartidaDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPart
 	}
 }
 
-int enderChegadaDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int enderChegada[TAM_ENDER], int j, int k){
+int enderChegadaDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int j, int k){
 	if(tabuleiro[j][k].jogador != vez){
 		return TRUE;
 	}
@@ -195,9 +198,9 @@ int enderDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAM_ENDER]
 	}
 	else{
 		switch(tipoEnder){
-			case 'P': resultado = enderPartidaDisponivel(tabuleiro, vez, ender, j ,k);
-						  break;
-			case 'C': resultado = enderChegadaDisponivel(tabuleiro, vez, ender, j ,k);
+			case 'P': resultado = enderPartidaDisponivel(tabuleiro, vez, j ,k);
+					  break;
+			case 'C': resultado = enderChegadaDisponivel(tabuleiro, vez, j ,k);
 		}
 		return resultado;
 	}
@@ -310,6 +313,7 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 			casaPraEnder(casaPartida, enderPartida);
 		}
 		pecaEscolhida = verifPeca(tabuleiro, enderPartida);
+		/*
 		if(pecaEscolhida == TORRE){
 			if(pecaLivre_4Direcoes(tabuleiro, vez, enderPartida) == FALSE){
 				pecaLivre = FALSE;
@@ -318,16 +322,28 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 				pecaLivre = TRUE;
 			}
 		}
+		*/
 		
 		
 		
-	}while(pecaLivre == FALSE);
+	}while(TRUE == FALSE/*pecaLivre == FALSE*/);
 	
 	char casaChegada[TAM_CASA];
 	printf("\nPara qual casa voce quer mecher essa peca? ");
 	lerCasa(casaChegada);
 	casaPraEnder(casaChegada, enderChegada);
-	int movDisponivel = TRUE;
+	int movDisponivel;
+	if(pecaEscolhida == TORRE){
+		if(movDisponivel_4Direcoes(tabuleiro, enderPartida, enderChegada) == FALSE){
+			movDisponivel = FALSE;
+		}
+		else{
+			movDisponivel = TRUE;
+		}
+	}
+		
+		
+		
 	while((enderDisponivel(tabuleiro, vez, enderChegada, CHEGADA) == FALSE) || (movDisponivel == FALSE)){
 		printf("Coordenada invalida. Digite outra: ");
 		lerCasa(casaChegada);
