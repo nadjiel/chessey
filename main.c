@@ -248,15 +248,36 @@ char verifPeca(peca tabuleiro[ORDEM][ORDEM], int ender[TAM_ENDER]){
 	return tabuleiro[j][k].nome;
 }
 
-int movHorizDisponivel(peca tabuleiro[ORDEM][ORDEM], int j, int kMaior, int kMenor){
-	int percorrer;
-	int contPecas = 0;
-	for(percorrer = kMenor+1; percorrer < kMaior; percorrer++){
-		if(tabuleiro[j][percorrer].jogador != VAZIO){
-			contPecas++;
+int contPecasHoriz(peca tabuleiro[ORDEM][ORDEM], int j, int kMaior, int kMenor){
+	if(kMaior == kMenor+1){
+		return 0;
+	}
+	else{
+		if(tabuleiro[j][kMenor+1].jogador != VAZIO){
+			return 1+contPecasHoriz(tabuleiro, j, kMaior, kMenor+1);
+		}
+		else{
+			return contPecasHoriz(tabuleiro, j, kMaior, kMenor+1);
 		}
 	}
-	if(contPecas > 0){
+}
+
+int contPecasVerti(peca tabuleiro[ORDEM][ORDEM], int k, int jMaior, int jMenor){
+	if(jMaior == jMenor+1){
+		return 0;
+	}
+	else{
+		if(tabuleiro[jMenor+1][k].jogador != VAZIO){
+			return 1+contPecasVerti(tabuleiro, k, jMaior, jMenor+1);
+		}
+		else{
+			return contPecasVerti(tabuleiro, k, jMaior, jMenor+1);
+		}
+	}
+}
+
+int movHorizDisponivel(peca tabuleiro[ORDEM][ORDEM], int j, int kMaior, int kMenor){
+	if(contPecasHoriz(tabuleiro, j, kMaior, kMenor) > 0){
 		return FALSE;
 	}
 	else{
@@ -265,14 +286,7 @@ int movHorizDisponivel(peca tabuleiro[ORDEM][ORDEM], int j, int kMaior, int kMen
 }
 
 int movVertiDisponivel(peca tabuleiro[ORDEM][ORDEM], int k, int jMaior, int jMenor){
-	int percorrer;
-	int contPecas = 0;
-	for(percorrer = jMenor+1; percorrer < jMaior; percorrer++){
-		if((tabuleiro[percorrer][k].jogador == '1') || (tabuleiro[percorrer][k].jogador == '2')){
-			contPecas++;
-		}
-	}
-	if(contPecas > 0){
+	if(contPecasVerti(tabuleiro, k, jMaior, jMenor) > 0){
 		return FALSE;
 	}
 	else{
@@ -312,16 +326,36 @@ int movDisponivel_4Direcoes(peca tabuleiro[ORDEM][ORDEM], int enderPartida[TAM_E
 	return resultado;
 }
 
-int movDiagDecresDisponivel(peca tabuleiro[ORDEM][ORDEM], int jMaior, int jMenor, int kMaior, int kMenor){
-	int contPecas = 0;
-	int percorrerJ, percorrerK = kMenor;
-	for(percorrerJ = jMenor+1; percorrerJ < jMaior; percorrerJ++){
-		percorrerK++;
-		if(tabuleiro[percorrerJ][percorrerK].jogador != VAZIO){
-			contPecas++;
+int contPecasDiagDecres(peca tabuleiro[ORDEM][ORDEM], int jMaior, int jMenor, int kMaior, int kMenor){
+	if(jMenor+1 == jMaior && kMenor+1 == kMaior){
+		return 0;
+	}
+	else{
+		if(tabuleiro[jMenor+1][kMenor+1].jogador != VAZIO){
+			return 1+contPecasDiagDecres(tabuleiro, jMaior, jMenor+1, kMaior, kMenor+1);
+		}
+		else{
+			return contPecasDiagDecres(tabuleiro, jMaior, jMenor+1, kMaior, kMenor+1);
 		}
 	}
-	if(contPecas > 0){
+}
+
+int contPecasDiagCres(peca tabuleiro[ORDEM][ORDEM], int jMaior, int jMenor, int kMaior, int kMenor){
+	if(jMenor+1 == jMaior && kMaior-1 == kMenor){
+		return 0;
+	}
+	else{
+		if(tabuleiro[jMenor+1][kMaior-1].jogador != VAZIO){
+			return 1+contPecasDiagCres(tabuleiro, jMaior, jMenor+1, kMaior-1, kMenor);
+		}
+		else{
+			return contPecasDiagCres(tabuleiro, jMaior, jMenor+1, kMaior-1, kMenor);
+		}
+	}
+}
+
+int movDiagDecresDisponivel(peca tabuleiro[ORDEM][ORDEM], int jMaior, int jMenor, int kMaior, int kMenor){
+	if(contPecasDiagDecres(tabuleiro, jMaior, jMenor, kMaior, kMenor) > 0){
 		return FALSE;
 	}
 	else{
@@ -330,15 +364,7 @@ int movDiagDecresDisponivel(peca tabuleiro[ORDEM][ORDEM], int jMaior, int jMenor
 }
 
 int movDiagCresDisponivel(peca tabuleiro[ORDEM][ORDEM], int jMaior, int jMenor, int kMaior, int kMenor){
-	int contPecas = 0;
-	int percorrerJ, percorrerK = kMenor;
-	for(percorrerJ = jMaior-1; percorrerJ > jMenor; percorrerJ--){
-		percorrerK++;
-		if(tabuleiro[percorrerJ][percorrerK].jogador != VAZIO){
-			contPecas++;
-		}
-	}
-	if(contPecas > 0){
+	if(contPecasDiagCres(tabuleiro, jMaior, jMenor, kMaior, kMenor) > 0){
 		return FALSE;
 	}
 	else{
@@ -1224,10 +1250,14 @@ void main(){
 	char jogador1[TAM_NICKNAME];
 	char jogador2[TAM_NICKNAME];
 	
+	//Testar funções
+	
+	/*
 	printf("Informe seu nickname, jogador 1 (de 1 a 10 caracteres e sem espaco): ");
 	lerNickname(jogador1);
 	printf("\nInforme seu nickname, jogador 2 (de 1 a 10 caracteres e sem espaco): ");
 	lerNickname(jogador2);
+	*/
 	
 	do{
 		promoverPeao(tabuleiro);
