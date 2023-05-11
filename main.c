@@ -4,6 +4,8 @@ Continuar trabalhando no procedimento perguntarJogada()
 Fazer casos nos quais outras pecas foram escolhidas
 Fazer os eventos especiais, tipo xeque, roque
 Elaborar se as pecas escolhidas nao sao torres estao livres ou presas, tal como se um movimento escolhido para ser realizado com elas seria possível
+Ajeitar erro de deixar pecas passarem por outras
+Adicionar o parametro de medicao de uma peca estar livre ou nao de ela estar na borda do tabuleiro
 */
 
 #include<stdio.h>
@@ -17,9 +19,9 @@ typedef struct tipoPeca{
 const int ERRO = -1;
 const int FALSE = 0;
 const int TRUE = 1;
-const int TAMANHO_NICKNAME = 11;
-const int TAMANHO_CASA = 3;
-const int TAMANHO_ENDER = 2;
+const int TAM_NICKNAME = 11;
+const int TAM_CASA = 3;
+const int TAM_ENDER = 2;
 const int ORDEM = 8;
 const char PARTIDA = 'P';
 const char CHEGADA = 'C';
@@ -32,6 +34,22 @@ const char DAMA = 'D';
 const char REI = 'R';
 
 void iniciarTabuleiro(peca tabuleiro[ORDEM][ORDEM]){
+	//EXCLUIR PARTE DE DEBUG
+	int j, k;
+	for(j = 0; j < ORDEM; j++){
+		for(k = 0; k < ORDEM; k++){
+			tabuleiro[j][k].nome = VAZIO;
+			tabuleiro[j][k].jogador = VAZIO;
+			tabuleiro[j][k].jogadas = 0;
+		}
+	}
+	tabuleiro[7][0].nome = TORRE;
+	tabuleiro[7][0].jogador = '1';
+	tabuleiro[3][3].nome = TORRE;
+	tabuleiro[3][3].jogador = '2';
+	tabuleiro[4][4].nome = TORRE;
+	tabuleiro[4][4].jogador = '1';
+	/*
 	tabuleiro[0][0].nome = TORRE;
 	tabuleiro[0][7].nome = TORRE;
 	tabuleiro[7][0].nome = TORRE;
@@ -83,6 +101,7 @@ void iniciarTabuleiro(peca tabuleiro[ORDEM][ORDEM]){
 			tabuleiro[j][k].jogadas = 0;
 		}
 	}
+	*/
 }
 
 int coordCharPraCoordInt(char coord){
@@ -107,7 +126,7 @@ int coordCharPraCoordInt(char coord){
 	}
 }
 
-void casaPraEnder(char casa[TAMANHO_CASA], int ender[TAMANHO_ENDER]){
+void casaPraEnder(char casa[TAM_CASA], int ender[TAM_ENDER]){
 	ender[0] = coordCharPraCoordInt(casa[1]);
 	ender[1] = coordCharPraCoordInt(casa[0]);
 }
@@ -128,13 +147,13 @@ void imprimirTabuleiro(peca tabuleiro[ORDEM][ORDEM]){
 	}
 }
 
-void lerNickname(char nickname[TAMANHO_NICKNAME]){
+void lerNickname(char nickname[TAM_NICKNAME]){
 	fflush(stdin);
 	printf("Informe seu nickname (de 1 a 10 caracteres e sem espaco): ");
 	scanf("%s",nickname);
 }
 
-void lerCasa(char casa[TAMANHO_CASA]){
+void lerCasa(char casa[TAM_CASA]){
 	fflush(stdin);
 	scanf("%s",casa);
 }
@@ -148,14 +167,7 @@ char verifVez(int turno){
 	}
 }
 
-char vezIntPraVezChar(int vez){
-	switch(vez){
-		case 1: return '1';
-		case 2: return '2';
-	}
-}
-
-int enderPartidaDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TAMANHO_ENDER], int j, int k){
+int enderPartidaDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TAM_ENDER], int j, int k){
 	if(tabuleiro[j][k].jogador == vez){
 		return TRUE;
 	}
@@ -164,7 +176,7 @@ int enderPartidaDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPart
 	}
 }
 
-int enderChegadaDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int enderChegada[TAMANHO_ENDER], int j, int k){
+int enderChegadaDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int enderChegada[TAM_ENDER], int j, int k){
 	if(tabuleiro[j][k].jogador != vez){
 		return TRUE;
 	}
@@ -173,7 +185,7 @@ int enderChegadaDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int enderCheg
 	}
 }
 
-int enderDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAMANHO_ENDER], char tipoEnder){
+int enderDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAM_ENDER], char tipoEnder){
 	int j, k;
 	j = ender[0];
 	k = ender[1];
@@ -191,7 +203,7 @@ int enderDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAMANHO_EN
 	}
 }
 
-char verifPeca(peca tabuleiro[ORDEM][ORDEM], int ender[TAMANHO_ENDER]){
+char verifPeca(peca tabuleiro[ORDEM][ORDEM], int ender[TAM_ENDER]){
 	int j = ender[0];
 	int k = ender[1];
 	return tabuleiro[j][k].nome;
@@ -199,29 +211,37 @@ char verifPeca(peca tabuleiro[ORDEM][ORDEM], int ender[TAMANHO_ENDER]){
 
 int movHorizDisponivel(peca tabuleiro[ORDEM][ORDEM], int j, int kMaior, int kMenor){
 	int percorrer;
-	for(percorrer = ++kMenor; percorrer < kMaior; percorrer++){
+	int contPecas = 0;
+	for(percorrer = kMenor+1; percorrer < kMaior; percorrer++){
 		if((tabuleiro[j][percorrer].jogador == '1') || (tabuleiro[j][percorrer].jogador == '2')){
-			return FALSE;
+			contPecas++;
 		}
-		else{
-			return TRUE;
-		}
+	}
+	if(contPecas > 0){
+		return FALSE;
+	}
+	else{
+		return TRUE;
 	}
 }
 
 int movVertiDisponivel(peca tabuleiro[ORDEM][ORDEM], int k, int jMaior, int jMenor){
 	int percorrer;
-	for(percorrer = ++jMenor; percorrer < jMaior; percorrer++){
+	int contPecas = 0;
+	for(percorrer = jMenor+1; percorrer < jMaior; percorrer++){
 		if((tabuleiro[percorrer][k].jogador == '1') || (tabuleiro[percorrer][k].jogador == '2')){
-			return FALSE;
+			contPecas++;
 		}
-		else{
-			return TRUE;
-		}
+	}
+	if(contPecas > 0){
+		return FALSE;
+	}
+	else{
+		return TRUE;
 	}
 }
 
-int movDisponivel_4Direcoes(peca tabuleiro[ORDEM][ORDEM], int enderPartida[TAMANHO_ENDER], int enderChegada[TAMANHO_ENDER]){
+int movDisponivel_4Direcoes(peca tabuleiro[ORDEM][ORDEM], int enderPartida[TAM_ENDER], int enderChegada[TAM_ENDER]){
 	if((enderPartida[0] != enderChegada[0]) && (enderPartida[1] != enderChegada[1])){
 		return FALSE;
 	}
@@ -260,7 +280,7 @@ int haPecaJogadorAtual(peca tabuleiro[ORDEM][ORDEM], char vez, int j, int k){
 	}
 }
 
-int pecaLivre_4Direcoes(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAMANHO_ENDER]){
+int pecaLivre_4Direcoes(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAM_ENDER]){
 	int j = ender[0];
 	int k = ender[1];
 	int pecasBloqueando = 0;
@@ -276,8 +296,8 @@ int pecaLivre_4Direcoes(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAMANH
 	}
 }
 
-void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TAMANHO_ENDER], int enderChegada[TAMANHO_ENDER]){
-	char casaPartida[TAMANHO_CASA];
+void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TAM_ENDER], int enderChegada[TAM_ENDER]){
+	char casaPartida[TAM_CASA];
 	printf("\nQual peca voce quer mexer? ");
 	lerCasa(casaPartida);
 	casaPraEnder(casaPartida, enderPartida);
@@ -303,17 +323,15 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 		
 	}while(pecaLivre == FALSE);
 	
-	char casaChegada[TAMANHO_CASA];
+	char casaChegada[TAM_CASA];
 	printf("\nPara qual casa voce quer mecher essa peca? ");
 	lerCasa(casaChegada);
 	casaPraEnder(casaChegada, enderChegada);
-	int movDisponivel;
-	do{
-		while(enderDisponivel(tabuleiro, vez, enderChegada, CHEGADA) == FALSE){
-			printf("Coordenada invalida. Digite outra: ");
-			lerCasa(casaChegada);
-			casaPraEnder(casaChegada, enderChegada);
-		}
+	int movDisponivel = TRUE;
+	while((enderDisponivel(tabuleiro, vez, enderChegada, CHEGADA) == FALSE) || (movDisponivel == FALSE)){
+		printf("Coordenada invalida. Digite outra: ");
+		lerCasa(casaChegada);
+		casaPraEnder(casaChegada, enderChegada);
 		if(pecaEscolhida == TORRE){
 			if(movDisponivel_4Direcoes(tabuleiro, enderPartida, enderChegada) == FALSE){
 				movDisponivel = FALSE;
@@ -325,10 +343,10 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 		
 		
 		
-	}while(movDisponivel == FALSE);
+	}
 }
 
-void efetuarJogada(peca tabuleiro[ORDEM][ORDEM], int enderPartida[TAMANHO_ENDER], int enderChegada[TAMANHO_ENDER]){
+void efetuarJogada(peca tabuleiro[ORDEM][ORDEM], int enderPartida[TAM_ENDER], int enderChegada[TAM_ENDER]){
 	int j1 = enderPartida[0];
 	int k1 = enderPartida[1];
 	int j2 = enderChegada[0];
@@ -341,8 +359,8 @@ void efetuarJogada(peca tabuleiro[ORDEM][ORDEM], int enderPartida[TAMANHO_ENDER]
 }
 
 void efetuarTurno(peca tabuleiro[ORDEM][ORDEM], char vez){
-	int enderPartida[TAMANHO_ENDER];
-	int enderChegada[TAMANHO_ENDER];
+	int enderPartida[TAM_ENDER];
+	int enderChegada[TAM_ENDER];
 	perguntarJogada(tabuleiro, vez, enderPartida, enderChegada);
 	efetuarJogada(tabuleiro, enderPartida, enderChegada);
 }
@@ -351,8 +369,8 @@ void main(){
 	
 	peca tabuleiro[ORDEM][ORDEM];
 	iniciarTabuleiro(tabuleiro);
-	char jogador1[TAMANHO_NICKNAME];
-	char jogador2[TAMANHO_NICKNAME];
+	char jogador1[TAM_NICKNAME];
+	char jogador2[TAM_NICKNAME];
 	/*
 	lerNickname(jogador1);
 	printf("\n");
@@ -364,7 +382,8 @@ void main(){
 	
 	do{
 		printf("\n\n");
-		turno++;
+		//turno++;
+		turno = 1;	//APAGAR LINHA
 		char vez = verifVez(turno);
 		imprimirTabuleiro(tabuleiro);
 		efetuarTurno(tabuleiro, vez);
