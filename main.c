@@ -199,8 +199,17 @@ char verifVez(int turno){
 	}
 }
 
-int enderPartidaDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int j, int k){
+int pecaDaVezPresente(peca tabuleiro[ORDEM][ORDEM], char vez, int j, int k){
 	if(tabuleiro[j][k].jogador == vez){
+		return TRUE;
+	}
+	else{
+		return FALSE;
+	}
+}
+
+int enderPartidaDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int j, int k){
+	if(pecaDaVezPresente(tabuleiro, vez, j, k) == TRUE){
 		return TRUE;
 	}
 	else{
@@ -274,15 +283,16 @@ int movVertiDisponivel(peca tabuleiro[ORDEM][ORDEM], int k, int jMaior, int jMen
 }
 
 int movDisponivel_4Direcoes(peca tabuleiro[ORDEM][ORDEM], int enderPartida[TAM_ENDER], int enderChegada[TAM_ENDER]){
-	if((enderPartida[0] != enderChegada[0]) && (enderPartida[1] != enderChegada[1])){
-		return FALSE;
-	}
-	int j1 = enderPartida[0];
-	int j2 = enderChegada[0];
-	int k1 = enderPartida[1];
-	int k2 = enderChegada[1];
-	int percorrer;
 	int resultado;
+	int j1 = enderPartida[0];
+	int k1 = enderPartida[1];
+	int j2 = enderChegada[0];
+	int k2 = enderChegada[1];
+	
+	if((j1 != j2) && (k1 != k2)){
+		resultado = FALSE;
+	}
+	
 	if(j1 == j2){
 		if(k1 > k2){
 			resultado = movHorizDisponivel(tabuleiro, j1, k1, k2);
@@ -290,8 +300,8 @@ int movDisponivel_4Direcoes(peca tabuleiro[ORDEM][ORDEM], int enderPartida[TAM_E
 		else{
 			resultado = movHorizDisponivel(tabuleiro, j1, k2, k1);
 		}
-		return resultado;
 	}
+	
 	if(k1 == k2){
 		if(j1 > j2){
 			resultado = movVertiDisponivel(tabuleiro, k1, j1, j2);
@@ -299,17 +309,85 @@ int movDisponivel_4Direcoes(peca tabuleiro[ORDEM][ORDEM], int enderPartida[TAM_E
 		else{
 			resultado = movVertiDisponivel(tabuleiro, k1, j2, j1);
 		}
-		return resultado;
+	}
+	
+	return resultado;
+}
+
+int movDiagDecresDisponivel(peca tabuleiro[ORDEM][ORDEM], int jMaior, int jMenor, int kMaior, int kMenor){
+	int contPecas = 0;
+	int percorrerJ, percorrerK = kMenor;
+	for(percorrerJ = jMenor+1; percorrerJ < jMaior; percorrerJ++){
+		percorrerK++;
+		if(tabuleiro[percorrerJ][percorrerK].jogador != VAZIO){
+			contPecas++;
+		}
+	}
+	if(contPecas > 0){
+		return FALSE;
+	}
+	else{
+		return TRUE;
 	}
 }
 
-int pecaBloqueando(peca tabuleiro[ORDEM][ORDEM], char vez, int j, int k){
-	if(tabuleiro[j][k].jogador == vez){
-		return TRUE;
+int movDiagCresDisponivel(peca tabuleiro[ORDEM][ORDEM], int jMaior, int jMenor, int kMaior, int kMenor){
+	int contPecas = 0;
+	int percorrerJ, percorrerK = kMenor;
+	for(percorrerJ = jMaior-1; percorrerJ > jMenor; percorrerJ--){
+		percorrerK++;
+		if(tabuleiro[percorrerJ][percorrerK].jogador != VAZIO){
+			contPecas++;
+		}
 	}
-	else{
+	if(contPecas > 0){
 		return FALSE;
 	}
+	else{
+		return TRUE;
+	}
+}
+
+int movDisponivel_4Diagonais(peca tabuleiro[ORDEM][ORDEM], int enderPartida[TAM_ENDER], int enderChegada[TAM_ENDER]){
+	int resultado = FALSE;
+	int j1 = enderPartida[0];
+	int k1 = enderPartida[1];
+	int j2 = enderChegada[0];
+	int k2 = enderChegada[1];
+	
+	int percorrer;
+	if(j1 < j2 && k1 < k2){
+		for(percorrer = 1; j1+percorrer <= j2; percorrer++){
+			if((j1+percorrer == j2) && (k1+percorrer == k2)){
+				resultado = movDiagDecresDisponivel(tabuleiro, j2, j1, k2, k1);
+			}
+		}
+	}
+	
+	if(j1 > j2 && k1 > k2){
+		for(percorrer = 1; j1-percorrer >= j2; percorrer++){
+			if((j1-percorrer == j2) && (k1-percorrer == k2)){
+				resultado = movDiagDecresDisponivel(tabuleiro, j1, j2, k1, k2);
+			}
+		}
+	}
+	
+	if(j1 < j2 && k1 > k2){
+		for(percorrer = 1; j1+percorrer <= j2; percorrer++){
+			if((j1+percorrer == j2) && (k1-percorrer == k2)){
+				resultado = movDiagCresDisponivel(tabuleiro, j2, j1, k1, k2);
+			}
+		}
+	}
+	
+	if(j1 > j2 && k1 < k2){
+		for(percorrer = 1; j1-percorrer >= j2; percorrer++){
+			if((j1-percorrer == j2) && (k1+percorrer == k2)){
+				resultado = movDiagCresDisponivel(tabuleiro, j1, j2, k2, k1);
+			}
+		}
+	}
+	return resultado;
 }
 
 int pecaLivre_4Direcoes(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAM_ENDER]){
@@ -320,7 +398,7 @@ int pecaLivre_4Direcoes(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAM_EN
 		obstaculos++;
 	}
 	else{
-		if(pecaBloqueando(tabuleiro, vez, j+1, k) == TRUE){
+		if(pecaDaVezPresente(tabuleiro, vez, j+1, k) == TRUE){
 			obstaculos++;
 		}
 	}
@@ -328,7 +406,7 @@ int pecaLivre_4Direcoes(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAM_EN
 		obstaculos++;
 	}
 	else{
-		if(pecaBloqueando(tabuleiro, vez, j, k+1) == TRUE){
+		if(pecaDaVezPresente(tabuleiro, vez, j, k+1) == TRUE){
 			obstaculos++;
 		}
 	}
@@ -336,7 +414,7 @@ int pecaLivre_4Direcoes(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAM_EN
 		obstaculos++;
 	}
 	else{
-		if(pecaBloqueando(tabuleiro, vez, j-1, k) == TRUE){
+		if(pecaDaVezPresente(tabuleiro, vez, j-1, k) == TRUE){
 			obstaculos++;
 		}
 	}
@@ -344,7 +422,7 @@ int pecaLivre_4Direcoes(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAM_EN
 		obstaculos++;
 	}
 	else{
-		if(pecaBloqueando(tabuleiro, vez, j, k-1) == TRUE){
+		if(pecaDaVezPresente(tabuleiro, vez, j, k-1) == TRUE){
 			obstaculos++;
 		}
 	}
@@ -360,80 +438,90 @@ int pecaLivre_4Diagonais(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAM_E
 	int j = ender[0];
 	int k = ender[1];
 	int obstaculos = 0;
+	
 	if((j > 0 && j < 7) && (k > 0 && k < 7)){
-		if(pecaBloqueando(tabuleiro, vez, j-1, k-1) == TRUE){
+		if(pecaDaVezPresente(tabuleiro, vez, j-1, k-1) == TRUE){
 			obstaculos++;
 		}
-		if(pecaBloqueando(tabuleiro, vez, j-1, k+1) == TRUE){
+		if(pecaDaVezPresente(tabuleiro, vez, j-1, k+1) == TRUE){
 			obstaculos++;
 		}
-		if(pecaBloqueando(tabuleiro, vez, j+1, k-1) == TRUE){
+		if(pecaDaVezPresente(tabuleiro, vez, j+1, k-1) == TRUE){
 			obstaculos++;
 		}
-		if(pecaBloqueando(tabuleiro, vez, j+1, k+1) == TRUE){
+		if(pecaDaVezPresente(tabuleiro, vez, j+1, k+1) == TRUE){
 			obstaculos++;
 		}
 	}
-	if((j == 7) && (k < 7) && (k > 0)){
+	
+	if((j == 7) && (k > 0 && k < 7)){
 		obstaculos += 2;
-		if(pecaBloqueando(tabuleiro, vez, j-1, k-1) == TRUE){
+		if(pecaDaVezPresente(tabuleiro, vez, j-1, k-1) == TRUE){
 			obstaculos++;
 		}
-		if(pecaBloqueando(tabuleiro, vez, j-1, k+1) == TRUE){
+		if(pecaDaVezPresente(tabuleiro, vez, j-1, k+1) == TRUE){
 			obstaculos++;
 		}
 	}
-	if((k == 7) && (j < 7) && (j > 0)){
+	
+	if((j == 0) && (k > 0 && k < 7)){
 		obstaculos += 2;
-		if(pecaBloqueando(tabuleiro, vez, j-1, k-1) == TRUE){
+		if(pecaDaVezPresente(tabuleiro, vez, j+1, k-1) == TRUE){
 			obstaculos++;
 		}
-		if(pecaBloqueando(tabuleiro, vez, j+1, k-1) == TRUE){
+		if(pecaDaVezPresente(tabuleiro, vez, j+1, k+1) == TRUE){
 			obstaculos++;
 		}
 	}
+	
+	if((k == 7) && (j < 0 && j > 7)){
+		obstaculos += 2;
+		if(pecaDaVezPresente(tabuleiro, vez, j-1, k-1) == TRUE){
+			obstaculos++;
+		}
+		if(pecaDaVezPresente(tabuleiro, vez, j+1, k-1) == TRUE){
+			obstaculos++;
+		}
+	}
+	
+	if((k == 0) && (j > 0 && j < 7)){
+		obstaculos += 2;
+		if(pecaDaVezPresente(tabuleiro, vez, j-1, k+1) == TRUE){
+			obstaculos++;
+		}
+		if(pecaDaVezPresente(tabuleiro, vez, j+1, k+1) == TRUE){
+			obstaculos++;
+		}
+	}
+	
 	if((j == 7) && (k == 7)){
 		obstaculos += 3;
-		if(pecaBloqueando(tabuleiro, vez, j-1, k-1) == TRUE){
+		if(pecaDaVezPresente(tabuleiro, vez, j-1, k-1) == TRUE){
 			obstaculos++;
 		}
 	}
-	if((j == 0) && (k > 0) && (k < 7)){
-		obstaculos += 2;
-		if(pecaBloqueando(tabuleiro, vez, j+1, k-1) == TRUE){
-			obstaculos++;
-		}
-		if(pecaBloqueando(tabuleiro, vez, j+1, k+1) == TRUE){
-			obstaculos++;
-		}
-	}
-	if((j == 0) && (k == 7)){
-		obstaculos += 3;
-		if(pecaBloqueando(tabuleiro, vez, j+1, k-1) == TRUE){
-			obstaculos++;
-		}
-	}
-	if((k == 0) && (j > 0) && (j < 7)){
-		obstaculos += 2;
-		if(pecaBloqueando(tabuleiro, vez, j-1, k+1) == TRUE){
-			obstaculos++;
-		}
-		if(pecaBloqueando(tabuleiro, vez, j+1, k+1) == TRUE){
-			obstaculos++;
-		}
-	}
+	
 	if((j == 0) && (k == 0)){
 		obstaculos += 3;
-		if(pecaBloqueando(tabuleiro, vez, j+1, k+1) == TRUE){
+		if(pecaDaVezPresente(tabuleiro, vez, j+1, k+1) == TRUE){
 			obstaculos++;
 		}
 	}
+	
+	if((j == 0) && (k == 7)){
+		obstaculos += 3;
+		if(pecaDaVezPresente(tabuleiro, vez, j+1, k-1) == TRUE){
+			obstaculos++;
+		}
+	}
+	
 	if((j == 7) && (k == 0)){
 		obstaculos += 3;
-		if(pecaBloqueando(tabuleiro, vez, j-1, k+1) == TRUE){
+		if(pecaDaVezPresente(tabuleiro, vez, j-1, k+1) == TRUE){
 			obstaculos++;
 		}
 	}
+	
 	if(obstaculos == 4){
 		return FALSE;
 	}
@@ -482,6 +570,14 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 				pecaLivre = TRUE;
 			}
 		}
+		if(pecaEscolhida == BISPO){
+			if(pecaLivre_4Diagonais(tabuleiro, vez, enderPartida) == FALSE){
+				pecaLivre = FALSE;
+			}
+			else{
+				pecaLivre = TRUE;
+			}
+		}
 		
 		
 		
@@ -500,6 +596,14 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 			movDisponivel = TRUE;
 		}
 	}
+	if(pecaEscolhida == BISPO){
+		if(movDisponivel_4Diagonais(tabuleiro, enderPartida, enderChegada) == FALSE){
+			movDisponivel = FALSE;
+		}
+		else{
+			movDisponivel = TRUE;
+		}
+	}
 		
 		
 		
@@ -509,6 +613,14 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 		casaPraEnder(casaChegada, enderChegada);
 		if(pecaEscolhida == TORRE){
 			if(movDisponivel_4Direcoes(tabuleiro, enderPartida, enderChegada) == FALSE){
+				movDisponivel = FALSE;
+			}
+			else{
+				movDisponivel = TRUE;
+			}
+		}
+		if(pecaEscolhida == BISPO){
+			if(movDisponivel_4Diagonais(tabuleiro, enderPartida, enderChegada) == FALSE){
 				movDisponivel = FALSE;
 			}
 			else{
