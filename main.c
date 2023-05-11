@@ -2,9 +2,8 @@
 Atualizar turno fazendo o loop principal
 Continuar trabalhando no procedimento perguntarJogada()
 Fazer casos nos quais outras pecas foram escolhidas
-Fazer os eventos especiais, tipo xeque, roque
-Elaborar se as pecas escolhidas nao sao torres e estao livres ou presas, tal como se um movimento escolhido para ser realizado com elas seria possível
-Testar se um movimento eh disponivel com o bispo
+Fazer os eventos especiais, tipo xeque, roque, promocao, xeque-mate, captura-en-passent
+Corrigir erro anotado no caderno (sem aceitar algumas pecas de chegada)
 */
 
 #include<stdio.h>
@@ -33,7 +32,6 @@ const char DAMA = 'D';
 const char REI = 'R';
 
 void iniciarTabuleiro(peca tabuleiro[ORDEM][ORDEM]){
-	//EXCLUIR PARTE DE DEBUG
 	int j, k;
 	for(j = 0; j < ORDEM; j++){
 		for(k = 0; k < ORDEM; k++){
@@ -42,44 +40,10 @@ void iniciarTabuleiro(peca tabuleiro[ORDEM][ORDEM]){
 			tabuleiro[j][k].jogadas = 0;
 		}
 	}
-	tabuleiro[2][2].nome = TORRE;
-	tabuleiro[2][2].jogador = '1';
-	tabuleiro[2][4].nome = TORRE;
-	tabuleiro[2][4].jogador = '1';
-	tabuleiro[4][2].nome = TORRE;
-	tabuleiro[4][2].jogador = '1';
-	tabuleiro[4][4].nome = TORRE;
-	tabuleiro[4][4].jogador = '1';
-	tabuleiro[1][1].nome = TORRE;
-	tabuleiro[1][1].jogador = '1';
-	tabuleiro[1][6].nome = TORRE;
-	tabuleiro[1][6].jogador = '1';
-	tabuleiro[6][6].nome = TORRE;
-	tabuleiro[6][6].jogador = '1';
-	tabuleiro[6][1].nome = TORRE;
-	tabuleiro[6][1].jogador = '1';
-	tabuleiro[0][0].nome = BISPO;
+	
+	tabuleiro[0][0].nome = TORRE;
 	tabuleiro[0][0].jogador = '1';
-	tabuleiro[0][7].nome = BISPO;
-	tabuleiro[0][7].jogador = '1';
-	tabuleiro[7][0].nome = BISPO;
-	tabuleiro[7][0].jogador = '1';
-	tabuleiro[7][7].nome = BISPO;
-	tabuleiro[7][7].jogador = '1';
-	tabuleiro[3][3].nome = BISPO;
-	tabuleiro[3][3].jogador = '1';
-	tabuleiro[4][6].nome = BISPO;
-	tabuleiro[4][6].jogador = '1';
-	tabuleiro[1][3].nome = BISPO;
-	tabuleiro[1][3].jogador = '1';
-	tabuleiro[4][1].nome = BISPO;
-	tabuleiro[4][1].jogador = '1';
-	tabuleiro[6][3].nome = BISPO;
-	tabuleiro[6][3].jogador = '1';
-	tabuleiro[0][4].nome = BISPO;
-	tabuleiro[0][4].jogador = '1';
-	tabuleiro[0][2].nome = BISPO;
-	tabuleiro[0][2].jogador = '1';
+	tabuleiro[0][0].jogadas = 0;
 	
 	/*
 	tabuleiro[0][0].nome = TORRE;
@@ -199,6 +163,15 @@ char verifVez(int turno){
 	}
 }
 
+char verifInimigo(char vez){
+	if(vez == '1'){
+		return '2';
+	}
+	else{
+		return '1';
+	}
+}
+
 int pecaDaVezPresente(peca tabuleiro[ORDEM][ORDEM], char vez, int j, int k){
 	if(tabuleiro[j][k].jogador == vez){
 		return TRUE;
@@ -270,7 +243,7 @@ int movVertiDisponivel(peca tabuleiro[ORDEM][ORDEM], int k, int jMaior, int jMen
 	int percorrer;
 	int contPecas = 0;
 	for(percorrer = jMenor+1; percorrer < jMaior; percorrer++){
-		if((tabuleiro[percorrer][k].jogador == '1') || (tabuleiro[percorrer][k].jogador == '2')){
+		if(tabuleiro[percorrer][k].jogador != VAZIO){
 			contPecas++;
 		}
 	}
@@ -388,6 +361,147 @@ int movDisponivel_4Diagonais(peca tabuleiro[ORDEM][ORDEM], int enderPartida[TAM_
 		}
 	}
 	return resultado;
+}
+
+int movDisponivel_Dama(peca tabuleiro[ORDEM][ORDEM], int enderPartida[TAM_ENDER], int enderChegada[TAM_ENDER]){
+	int resultado = FALSE;
+	if(movDisponivel_4Direcoes(tabuleiro, enderPartida, enderChegada) == TRUE){
+		resultado = TRUE;
+	}
+	if(movDisponivel_4Diagonais(tabuleiro, enderPartida, enderChegada) == TRUE){
+		resultado = TRUE;
+	}
+	return resultado;
+}
+
+int movDisponivel_Rei(int enderPartida[TAM_ENDER], int enderChegada[TAM_ENDER]){
+	int j1 = enderPartida[0];
+	int k1 = enderPartida[1];
+	int j2 = enderChegada[0];
+	int k2 = enderChegada[1];
+	
+	if(j2 == j1-1 && k2 == k1){
+		return TRUE;
+	}
+	if(j2 == j1-1 && k2 == k1+1){
+		return TRUE;
+	}
+	if(j2 == j1 && k2 == k1+1){
+		return TRUE;
+	}
+	if(j2 == j1+1 && k2 == k1+1){
+		return TRUE;
+	}
+	if(j2 == j1+1 && k2 == k1){
+		return TRUE;
+	}
+	if(j2 == j1+1 && k2 == k1-1){
+		return TRUE;
+	}
+	if(j2 == j1 && k2 == k1-1){
+		return TRUE;
+	}
+	if(j2 == j1-1 && k2 == k1-1){
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+int movDisponivel_8Ls(int enderPartida[TAM_ENDER], int enderChegada[TAM_ENDER]){
+	int j1 = enderPartida[0];
+	int k1 = enderPartida[1];
+	int j2 = enderChegada[0];
+	int k2 = enderChegada[1];
+	
+	if(j2 == j1-2 && k2 == k1-1){
+		return TRUE;
+	}
+	if(j2 == j1-2 && k2 == k1+1){
+		return TRUE;
+	}
+	if(j2 == j1-1 && k2 == k1+2){
+		return TRUE;
+	}
+	if(j2 == j1+1 && k2 == k1+2){
+		return TRUE;
+	}
+	if(j2 == j1+2 && k2 == k1+1){
+		return TRUE;
+	}
+	if(j2 == j1+2 && k2 == k1-1){
+		return TRUE;
+	}
+	if(j2 == j1+1 && k2 == k1-2){
+		return TRUE;
+	}
+	if(j2 == j1-1 && k2 == k1-2){
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+int movDisponivel_Peao(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TAM_ENDER], int enderChegada[TAM_ENDER]){
+	char inimigo = verifInimigo(vez);
+	int j1 = enderPartida[0];
+	int k1 = enderPartida[1];
+	int j2 = enderChegada[0];
+	int k2 = enderChegada[1];
+	
+	if(vez == '1'){
+		if(j2 == j1-2 && k2 == k1){
+			if((tabuleiro[j1][k1].jogadas == 0) && (tabuleiro[j1-1][k1].jogador == VAZIO)){
+				return TRUE;
+			}
+			else{
+				return FALSE;
+			}
+		}
+		if(j2 == j1-1 && k2 == k1){
+			if(tabuleiro[j2][k2].jogador == VAZIO){
+				return TRUE;
+			}
+			else{
+				return FALSE;
+			}
+		}
+		if((j2 == j1-1 && k2 == k1-1) || (j2 == j1-1 && k2 == k1+1)){
+			if(tabuleiro[j2][k2].jogador == inimigo){
+				return TRUE;
+			}
+			else{
+				return FALSE;
+			}
+		}
+	}
+	
+	if(vez == '2'){
+		if(j2 == j1+2 && k2 == k1){
+			if((tabuleiro[j1][k1].jogadas == 0) && (tabuleiro[j1+1][k1].jogador == VAZIO)){
+				return TRUE;
+			}
+			else{
+				return FALSE;
+			}
+		}
+		if(j2 == j1+1 && k2 == k1){
+			if(tabuleiro[j2][k2].jogador == VAZIO){
+				return TRUE;
+			}
+			else{
+				return FALSE;
+			}
+		}
+		if((j2 == j1+1 && k2 == k1-1) || (j2 == j1+1 && k2 == k1+1)){
+			if(tabuleiro[j2][k2].jogador == inimigo){
+				return TRUE;
+			}
+			else{
+				return FALSE;
+			}
+		}
+	}
 }
 
 int pecaLivre_4Direcoes(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAM_ENDER]){
@@ -530,20 +644,63 @@ int pecaLivre_4Diagonais(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAM_E
 	}
 }
 
+int pecaLivre_Monarcas(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAM_ENDER]){
+	if((pecaLivre_4Direcoes(tabuleiro, vez, ender) == TRUE) || (pecaLivre_4Diagonais(tabuleiro, vez, ender) == TRUE)){
+		return TRUE;
+	}
+	else{
+		return FALSE;
+	}
+}
+
 int pecaLivre_8Ls(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAM_ENDER]){
 	int j = ender[0];
 	int k = ender[1];
 	int obstaculos = 0;
 	
-	if((j > 1 && j < 6) && (k > 1 && k < 6)){
-		obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k-1);
-		obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k+1);
-		obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k+2);
-		obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k+2);
-		obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k+1);
-		obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k-1);
-		obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k-2);
-		obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k-2);
+	if(j > 1 && j < 6){
+		if(k > 1 && k < 6){
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k-1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k+1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k+2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k+2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k+1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k-1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k-2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k-2);
+		}
+		if(k == 1){
+			obstaculos += 2;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k-1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k+1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k+2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k+2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k+1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k-1);
+		}
+		if(k == 0){
+			obstaculos += 4;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k+1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k+2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k+2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k+1);
+		}
+		if(k == 6){
+			obstaculos += 2;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k+1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k-1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k-2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k-2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k-1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k+1);
+		}
+		if(k == 7){
+			obstaculos += 4;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k-1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k-2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k-2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k-1);
+		}
 	}
 	
 	if(j == 1){
@@ -686,7 +843,65 @@ int pecaLivre_8Ls(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAM_ENDER]){
 		}
 	}
 	
+	if(obstaculos == 8){
+		return FALSE;
+	}
+	else{
+		return TRUE;
+	}
+}
+
+int pecaLivre_Peao(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAM_ENDER]){
+	char inimigo = verifInimigo(vez);
+	int j = ender[0];
+	int k = ender[1];
+	int obstaculos = 0;
 	
+	if(vez == '1'){
+		if(j == 0){
+			obstaculos += 3;
+		}
+		else{
+			if(tabuleiro[j-1][k].jogador != VAZIO){
+				obstaculos++;
+			}
+			if(tabuleiro[j-1][k-1].jogador != inimigo){
+				obstaculos++;
+			}
+			if(tabuleiro[j-1][k+1].jogador != inimigo){
+				obstaculos++;
+			}
+		}
+		if(obstaculos == 3){
+			return FALSE;
+		}
+		else{
+			return TRUE;
+		}
+	}
+	
+	if(vez == '2'){
+		if(j == 7){
+			obstaculos += 3;
+		}
+		else{
+			if(tabuleiro[j+1][k].jogador != VAZIO){
+				obstaculos++;
+			}
+			if(tabuleiro[j+1][k-1].jogador != inimigo){
+				obstaculos++;
+			}
+			if(tabuleiro[j+1][k+1].jogador != inimigo){
+				obstaculos++;
+			}
+		}
+		if(obstaculos == 3){
+			return FALSE;
+		}
+		else{
+			return TRUE;
+		}
+	}
 }
 
 void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TAM_ENDER], int enderChegada[TAM_ENDER]){
@@ -713,8 +928,30 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 			pecaLivre = TRUE;
 		}
 	}
-	
-	
+	if(pecaEscolhida = CAVALO){
+		if(pecaLivre_8Ls(tabuleiro, vez, enderPartida) == FALSE){
+			pecaLivre = FALSE;
+		}
+		else{
+			pecaLivre = TRUE;
+		}
+	}
+	if(pecaEscolhida == DAMA || pecaEscolhida == REI){
+		if(pecaLivre_Monarcas(tabuleiro, vez, enderPartida) == FALSE){
+			pecaLivre = FALSE;
+		}
+		else{
+			pecaLivre = TRUE;
+		}
+	}
+	if(pecaEscolhida == PEAO){
+		if(pecaLivre_Peao(tabuleiro, vez, enderPartida) == FALSE){
+			pecaLivre = FALSE;
+		}
+		else{
+			pecaLivre = TRUE;
+		}
+	}
 	
 	while((enderDisponivel(tabuleiro, vez, enderPartida, PARTIDA) == FALSE) || (pecaLivre == FALSE)){
 		printf("Coordenada invalida. Digite outra: ");
@@ -737,9 +974,30 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 				pecaLivre = TRUE;
 			}
 		}
-		
-		
-		
+		if(pecaEscolhida = CAVALO){
+			if(pecaLivre_8Ls(tabuleiro, vez, enderPartida) == FALSE){
+				pecaLivre = FALSE;
+			}
+			else{
+				pecaLivre = TRUE;
+			}
+		}
+		if(pecaEscolhida = DAMA || pecaEscolhida == REI){
+			if(pecaLivre_Monarcas(tabuleiro, vez, enderPartida) == FALSE){
+				pecaLivre = FALSE;
+			}
+			else{
+				pecaLivre = TRUE;
+			}
+		}
+		if(pecaEscolhida == PEAO){
+			if(pecaLivre_Peao(tabuleiro, vez, enderPartida) == FALSE){
+				pecaLivre = FALSE;
+			}
+			else{
+				pecaLivre = TRUE;
+			}
+		}
 	}
 	
 	char casaChegada[TAM_CASA];
@@ -763,9 +1021,38 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 			movDisponivel = TRUE;
 		}
 	}
-		
-		
-		
+	if(pecaEscolhida == CAVALO){
+		if(movDisponivel_8Ls(enderPartida, enderChegada) == FALSE){
+			movDisponivel = FALSE;
+		}
+		else{
+			movDisponivel = TRUE;
+		}
+	}
+	if(pecaEscolhida == DAMA){
+		if(movDisponivel_Dama(tabuleiro, enderPartida, enderChegada) == FALSE){
+			movDisponivel = FALSE;
+		}
+		else{
+			movDisponivel = TRUE;
+		}
+	}
+	if(pecaEscolhida == REI){
+		if(movDisponivel_Rei(enderPartida, enderChegada) == FALSE){
+			movDisponivel = FALSE;
+		}
+		else{
+			movDisponivel = TRUE;
+		}
+	}
+	if(pecaEscolhida == PEAO){
+		if(movDisponivel_Peao(tabuleiro, vez, enderPartida, enderChegada) == FALSE){
+			movDisponivel = FALSE;
+		}
+		else{
+			movDisponivel = TRUE;
+		}
+	}
 	while((enderDisponivel(tabuleiro, vez, enderChegada, CHEGADA) == FALSE) || (movDisponivel == FALSE)){
 		printf("Coordenada invalida. Digite outra: ");
 		lerCasa(casaChegada);
@@ -786,9 +1073,38 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 				movDisponivel = TRUE;
 			}
 		}
-		
-		
-		
+		if(pecaEscolhida == CAVALO){
+			if(movDisponivel_8Ls(enderPartida, enderChegada) == FALSE){
+				movDisponivel = FALSE;
+			}
+			else{
+				movDisponivel = TRUE;
+			}
+		}
+		if(pecaEscolhida = DAMA){
+			if(movDisponivel_Dama(tabuleiro, enderPartida, enderChegada) == FALSE){
+				movDisponivel = FALSE;
+			}
+			else{
+				movDisponivel = TRUE;
+			}
+		}
+		if(pecaEscolhida = REI){
+			if(movDisponivel_Rei(enderPartida, enderChegada) == FALSE){
+				movDisponivel = FALSE;
+			}
+			else{
+				movDisponivel = TRUE;
+			}
+		}
+		if(pecaEscolhida == PEAO){
+			if(movDisponivel_Peao(tabuleiro, vez, enderPartida, enderChegada) == FALSE){
+				movDisponivel = FALSE;
+			}
+			else{
+				movDisponivel = TRUE;
+			}
+		}
 	}
 }
 
