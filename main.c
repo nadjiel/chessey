@@ -46,41 +46,65 @@ void iniciarTabuleiro(peca tabuleiro[ORDEM][ORDEM]){
 			tabuleiro[j][k].jogadas = 0;
 		}
 	}
-	tabuleiro[4][4].nome = PEAO;
+	tabuleiro[1][1].nome = BISPO;
+	tabuleiro[1][1].jogador = '2';
+	tabuleiro[1][1].jogadas = 0;
+	
+	tabuleiro[2][2].nome = BISPO;
+	tabuleiro[2][2].jogador = '1';
+	tabuleiro[2][2].jogadas = 0;
+	
+	tabuleiro[3][3].nome = BISPO;
+	tabuleiro[3][3].jogador = '1';
+	tabuleiro[3][3].jogadas = 0;
+	
+	tabuleiro[1][4].nome = CAVALO;
+	tabuleiro[1][4].jogador = '1';
+	tabuleiro[1][4].jogadas = 0;
+	
+	tabuleiro[2][1].nome = CAVALO;
+	tabuleiro[2][1].jogador = '1';
+	tabuleiro[2][1].jogadas = 0;
+
+	tabuleiro[0][3].nome = DAMA;
+	tabuleiro[0][3].jogador = '2';
+	tabuleiro[0][3].jogadas = 0;
+	
+	tabuleiro[1][5].nome = DAMA;
+	tabuleiro[1][5].jogador = '1';
+	tabuleiro[1][5].jogadas = 0;
+	
+	tabuleiro[4][2].nome = PEAO;
+	tabuleiro[4][2].jogador = '2';
+	tabuleiro[4][2].jogadas = 0;
+	
+	tabuleiro[1][3].nome = DAMA;
+	tabuleiro[1][3].jogador = '1';
+	tabuleiro[1][3].jogadas = 0;
+	
+	tabuleiro[3][0].nome = TORRE;
+	tabuleiro[3][0].jogador = '2';
+	tabuleiro[3][0].jogadas = 0;
+	
+	tabuleiro[3][1].nome = TORRE;
+	tabuleiro[3][1].jogador = '1';
+	tabuleiro[3][1].jogadas = 0;
+	
+	tabuleiro[7][7].nome = BISPO;
+	tabuleiro[7][7].jogador = '2';
+	tabuleiro[7][7].jogadas = 0;
+	
+	tabuleiro[5][5].nome = BISPO;
+	tabuleiro[5][5].jogador = '1';
+	tabuleiro[5][5].jogadas = 0;
+	
+	tabuleiro[4][4].nome = REI;
 	tabuleiro[4][4].jogador = '1';
 	tabuleiro[4][4].jogadas = 0;
 	
-	tabuleiro[0][4].nome = TORRE;
-	tabuleiro[0][4].jogador = '2';
-	tabuleiro[0][4].jogadas = 0;
-	
-	tabuleiro[2][4].nome = TORRE;
-	tabuleiro[2][4].jogador = '1';
-	tabuleiro[2][4].jogadas = 0;
-	
-	tabuleiro[4][7].nome = TORRE;
-	tabuleiro[4][7].jogador = '2';
-	tabuleiro[4][7].jogadas = 0;
-	
-	tabuleiro[4][6].nome = TORRE;
-	tabuleiro[4][6].jogador = '2';
-	tabuleiro[4][6].jogadas = 0;
-	
-	tabuleiro[7][4].nome = TORRE;
-	tabuleiro[7][4].jogador = '2';
-	tabuleiro[7][4].jogadas = 0;
-	
-	tabuleiro[6][4].nome = TORRE;
-	tabuleiro[6][4].jogador = '2';
-	tabuleiro[6][4].jogadas = 0;
-	
-	tabuleiro[4][0].nome = TORRE;
-	tabuleiro[4][0].jogador = '2';
-	tabuleiro[4][0].jogadas = 0;
-	
-	tabuleiro[4][1].nome = TORRE;
-	tabuleiro[4][1].jogador = '1';
-	tabuleiro[4][1].jogadas = 0;
+	tabuleiro[3][2].nome = REI;
+	tabuleiro[3][2].jogador = '1';
+	tabuleiro[3][2].jogadas = 0;
 	
 	/*
 	tabuleiro[0][0].nome = TORRE;
@@ -1010,95 +1034,144 @@ int verifPecaLivre(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAM_ENDER],
 	}
 }
 
-int pecaOponentePraCima(peca tabuleiro[ORDEM][ORDEM], char oponente, int k, int jMaior, int jMenor, char peca, int *jOponente, int *kOponente){
-	if(jMenor+1 == jMaior){
-		return FALSE;
+void buscarOponentePraCima(peca tabuleiro[ORDEM][ORDEM], char oponente, char peca, int j, int k, int enderOponente[TAM_ENDER]){
+	if(j == 0){
+	}
+	else if((tabuleiro[j-1][k].nome == peca) && (tabuleiro[j-1][k].jogador == oponente)){
+		 	enderOponente[0] = j-1;
+		 	enderOponente[1] = k;
+		 }
+		 else{
+		 	buscarOponentePraCima(tabuleiro, oponente, peca, j-1, k, enderOponente);
+		 }
+}
+
+void buscarOponentePraDireita(peca tabuleiro[ORDEM][ORDEM], char oponente, char peca, int j, int k, int enderOponente[TAM_ENDER]){
+	if(k == 7){
+	}
+	else if((tabuleiro[j][k+1].nome == peca) && (tabuleiro[j][k+1].jogador == oponente)){
+		 	enderOponente[0] = j;
+		 	enderOponente[1] = k+1;
+		 }
+		 else{
+		 	buscarOponentePraDireita(tabuleiro, oponente, peca, j, k+1, enderOponente);
+		 }
+}
+
+void buscarOponentePraBaixo(peca tabuleiro[ORDEM][ORDEM], char oponente, char peca, int j, int k, int enderOponente[TAM_ENDER]){
+	if(j == 7){
+	}
+	else if((tabuleiro[j+1][k].nome == peca) && (tabuleiro[j+1][k].jogador == oponente)){
+		 	enderOponente[0] = j+1;
+		 	enderOponente[1] = k;
+		 }
+		 else{
+		 	buscarOponentePraBaixo(tabuleiro, oponente, peca, j+1, k, enderOponente);
+		 }
+}
+
+void buscarOponentePraEsquerda(peca tabuleiro[ORDEM][ORDEM], char oponente, char peca, int j, int k, int enderOponente[TAM_ENDER]){
+	if(k == 0){
+	}
+	else if((tabuleiro[j][k-1].nome == peca) && (tabuleiro[j][k-1].jogador == oponente)){
+		 	enderOponente[0] = j;
+		 	enderOponente[1] = k-1;
+		 }
+		 else{
+		 	buscarOponentePraEsquerda(tabuleiro, oponente, peca, j, k-1, enderOponente);
+		 }
+}
+
+void buscarOponentePraNord(peca tabuleiro[ORDEM][ORDEM], char oponente, char peca, int j, int k, int enderOponente[TAM_ENDER]){
+	if(j == 0 || k == 7){
+	}
+	else if((tabuleiro[j-1][k+1].nome == peca) && (tabuleiro[j-1][k+1].jogador == oponente)){
+		 	enderOponente[0] = j-1;
+		 	enderOponente[1] = k+1;
+		 }
+		 else{
+		 	buscarOponentePraNord(tabuleiro, oponente, peca, j-1, k+1, enderOponente);
+		 }
+}
+
+void buscarOponentePraSude(peca tabuleiro[ORDEM][ORDEM], char oponente, char peca, int j, int k, int enderOponente[TAM_ENDER]){
+	if(j == 7 || k == 7){
+	}
+	else if((tabuleiro[j+1][k+1].nome == peca) && (tabuleiro[j+1][k+1].jogador == oponente)){
+		 	enderOponente[0] = j+1;
+		 	enderOponente[1] = k+1;
+		 }
+		 else{
+		 	buscarOponentePraSude(tabuleiro, oponente, peca, j+1, k+1, enderOponente);
+		 }
+}
+
+void buscarOponentePraSudo(peca tabuleiro[ORDEM][ORDEM], char oponente, char peca, int j, int k, int enderOponente[TAM_ENDER]){
+	if(j == 7 || k == 0){
+	}
+	else if((tabuleiro[j+1][k-1].nome == peca) && (tabuleiro[j+1][k-1].jogador == oponente)){
+		 	enderOponente[0] = j+1;
+		 	enderOponente[1] = k-1;
+		 }
+		 else{
+		 	buscarOponentePraSudo(tabuleiro, oponente, peca, j+1, k-1, enderOponente);
+		 }
+}
+
+void buscarOponentePraNoro(peca tabuleiro[ORDEM][ORDEM], char oponente, char peca, int j, int k, int enderOponente[TAM_ENDER]){
+	if(j == 0 || k == 0){
+	}
+	else if((tabuleiro[j-1][k-1].nome == peca) && (tabuleiro[j-1][k-1].jogador == oponente)){
+		 	enderOponente[0] = j-1;
+		 	enderOponente[1] = k-1;
+		 }
+		 else{
+		 	buscarOponentePraNoro(tabuleiro, oponente, peca, j-1, k-1, enderOponente);
+		 }
+}
+
+int pecaAdversariaPresente(peca tabuleiro[ORDEM][ORDEM], char peca, char oponente, int j, int k){
+	if((tabuleiro[j][k].nome == peca) && (tabuleiro[j][k].jogador == oponente)){
+		return TRUE;
 	}
 	else{
-		if((tabuleiro[jMenor][k].nome == peca) && (tabuleiro[jMenor][k].jogador == oponente)){
-			*jOponente = jMenor;
-			*kOponente = k;
-			return TRUE;
-		}
-		else{
-			return pecaOponentePraCima(tabuleiro, oponente, k, jMaior, jMenor+1, peca, jOponente, kOponente);
-		}
+		return FALSE;
 	}
 }
 
-int pecaOponentePraDireita(peca tabuleiro[ORDEM][ORDEM], char oponente, int j, int kMaior, int kMenor, char peca, int *jOponente, int *kOponente){
-	if(kMaior-1 == kMenor){
-		return FALSE;
-	}
-	else{
-		if((tabuleiro[j][kMaior].nome == peca) && (tabuleiro[j][kMaior].jogador == oponente)){
-			*jOponente = j;
-			*kOponente = kMaior;
-			return TRUE;
-		}
-		else{
-			return pecaOponentePraCima(tabuleiro, oponente, j, kMaior-1, kMenor, peca, jOponente, kOponente);
-		}
-	}
-}
-
-int pecaOponentePraBaixo(peca tabuleiro[ORDEM][ORDEM], char oponente, int k, int jMaior, int jMenor, char peca, int *jOponente, int *kOponente){
-	if(jMaior-1 == jMenor){
-		return FALSE;
-	}
-	else{
-		if((tabuleiro[jMaior][k].nome == peca) && (tabuleiro[jMaior][k].jogador == oponente)){
-			*jOponente = jMaior;
-			*kOponente = k;
-			return TRUE;
-		}
-		else{
-			return pecaOponentePraCima(tabuleiro, oponente, k, jMaior-1, jMenor, peca, jOponente, kOponente);
-		}
-	}
-}
-
-int pecaOponentePraEsquerda(peca tabuleiro[ORDEM][ORDEM], char oponente, int j, int kMaior, int kMenor, char peca, int *jOponente, int *kOponente){
-	if(kMenor+1 == kMaior){
-		return FALSE;
-	}
-	else{
-		if((tabuleiro[j][kMenor].nome == peca) && (tabuleiro[j][kMenor].jogador == oponente)){
-			*jOponente = j;
-			*kOponente = kMenor;
-			return TRUE;
-		}
-		else{
-			return pecaOponentePraCima(tabuleiro, oponente, j, kMaior, kMenor+1, peca, jOponente, kOponente);
-		}
-	}
-}
-
-int ameacadaPorTorre(peca tabuleiro[ORDEM][ORDEM], char vez, int j, int k){
-	char oponente = verifOponente(vez);
-	int jOponente = NULO;
-	int kOponente = NULO;
+int ameacadaPor_4Direcoes(peca tabuleiro[ORDEM][ORDEM], char pecaOponente, int j, int k){
+	char oponente = verifOponente(tabuleiro[j][k].jogador);
+	int enderOponente[TAM_ENDER];
+	enderOponente[0] = NULO;
+	enderOponente[1] = NULO;
 	
-	if(pecaOponentePraCima(tabuleiro, oponente, k, j, 0, TORRE, &jOponente, &kOponente) == TRUE){
-		if(movVertiDisponivel(tabuleiro, k, j, jOponente) == TRUE){
+	buscarOponentePraCima(tabuleiro, oponente, pecaOponente, j, k, enderOponente);
+	if(enderOponente[0] != NULO){
+		if(movVertiDisponivel(tabuleiro, k, j, enderOponente[0]) == TRUE){
 			return TRUE;
 		}
 	}
-	
-	if(pecaOponentePraDireita(tabuleiro, oponente, j, ORDEM-1, k, TORRE, &jOponente, &kOponente) == TRUE){
-		if(movHorizDisponivel(tabuleiro, j, kOponente, k) == TRUE){
+	enderOponente[0] = NULO;
+	enderOponente[1] = NULO;
+	buscarOponentePraDireita(tabuleiro, oponente, pecaOponente, j, k, enderOponente);
+	if(enderOponente[1] != NULO){
+		if(movHorizDisponivel(tabuleiro, j, enderOponente[1], k) == TRUE){
 			return TRUE;
 		}
 	}
-	
-	if(pecaOponentePraBaixo(tabuleiro, oponente, k, ORDEM-1, j, TORRE, &jOponente, &kOponente) == TRUE){
-		if(movVertiDisponivel(tabuleiro, k, jOponente, j) == TRUE){
+	enderOponente[0] = NULO;
+	enderOponente[1] = NULO;
+	buscarOponentePraBaixo(tabuleiro, oponente, pecaOponente, j, k, enderOponente);
+	if(enderOponente[0] != NULO){
+		if(movVertiDisponivel(tabuleiro, k, enderOponente[0], j) == TRUE){
 			return TRUE;
 		}
 	}
-	
-	if(pecaOponentePraEsquerda(tabuleiro, oponente, j, k, 0, TORRE, &jOponente, &kOponente) == TRUE){
-		if(movHorizDisponivel(tabuleiro, j, k, kOponente) == TRUE){
+	enderOponente[0] = NULO;
+	enderOponente[1] = NULO;
+	buscarOponentePraEsquerda(tabuleiro, oponente, pecaOponente, j, k, enderOponente);
+	if(enderOponente[1] != NULO){
+		if(movHorizDisponivel(tabuleiro, j, k, enderOponente[1]) == TRUE){
 			return TRUE;
 		}
 	}
@@ -1106,42 +1179,383 @@ int ameacadaPorTorre(peca tabuleiro[ORDEM][ORDEM], char vez, int j, int k){
 	return FALSE;
 }
 
+int ameacadaPor_4Diagonais(peca tabuleiro[ORDEM][ORDEM], char pecaOponente, int j, int k){
+	char oponente = verifOponente(tabuleiro[j][k].jogador);
+	int enderOponente[TAM_ENDER];
+	enderOponente[0] = NULO;
+	enderOponente[1] = NULO;
+	
+	buscarOponentePraNord(tabuleiro, oponente, pecaOponente, j, k, enderOponente);
+	if(enderOponente[0] != NULO){
+		if(movDiagCresDisponivel(tabuleiro, j, enderOponente[0], enderOponente[1], k) == TRUE){
+			return TRUE;
+		}
+	}
+	enderOponente[0] = NULO;
+	enderOponente[1] = NULO;
+	buscarOponentePraSude(tabuleiro, oponente, pecaOponente, j, k, enderOponente);
+	if(enderOponente[0] != NULO){
+		if(movDiagDecresDisponivel(tabuleiro, enderOponente[0], j, enderOponente[1], k) == TRUE){
+			return TRUE;
+		}
+	}
+	enderOponente[0] = NULO;
+	enderOponente[1] = NULO;
+	buscarOponentePraSudo(tabuleiro, oponente, pecaOponente, j, k, enderOponente);
+	if(enderOponente[0] != NULO){
+		if(movDiagCresDisponivel(tabuleiro, enderOponente[0], j, k, enderOponente[1]) == TRUE){
+			return TRUE;
+		}
+	}
+	enderOponente[0] = NULO;
+	enderOponente[1] = NULO;
+	buscarOponentePraNoro(tabuleiro, oponente, pecaOponente, j, k, enderOponente);
+	if(enderOponente[0] != NULO){
+		if(movDiagDecresDisponivel(tabuleiro, j, enderOponente[0], k, enderOponente[1]) == TRUE){
+			return TRUE;
+		}
+	}
+	
+	return FALSE;
+}
+
+int ameacadaPorTorre(peca tabuleiro[ORDEM][ORDEM], int j, int k){
+	if(ameacadaPor_4Direcoes(tabuleiro, TORRE, j, k) == TRUE){
+		return TRUE;
+	}
+	else{
+		return FALSE;
+	}
+}
+
+int ameacadaPorBispo(peca tabuleiro[ORDEM][ORDEM], int j, int k){
+	if(ameacadaPor_4Diagonais(tabuleiro, BISPO, j, k) == TRUE){
+		return TRUE;
+	}
+	else{
+		return FALSE;
+	}
+}
+
+int ameacadaPorCavalo(peca tabuleiro[ORDEM][ORDEM], int j, int k){
+	char oponente = verifOponente(tabuleiro[j][k].jogador);
+	int atacantes = 0;
+	
+	if(j > 1 && j < 6){
+		if(k > 1 && k < 6){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k+2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k+2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k-2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k-2);
+		}
+		if(k == 1){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k+2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k+2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k-1);
+		}
+		if(k == 0){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k+2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k+2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k+1);
+		}
+		if(k == 6){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k-2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k-2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k+1);
+		}
+		if(k == 7){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k-2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k-2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k-1);
+		}
+	}
+	
+	if(j == 1){
+		if(k > 1 && k < 6){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k+2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k+2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k-2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k-2);
+		}
+		if(k == 1){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k+2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k+2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k-1);
+		}
+		if(k == 0){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k+2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k+2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k+1);
+		}
+		if(k == 6){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k-2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k-2);
+		}
+		if(k == 7){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k-2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k-2);
+		}
+	}
+	
+	if(j == 0){
+		if(k > 1 && k < 6){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k+2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k-2);
+		}
+		if(k == 1){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k+2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k-1);
+		}
+		if(k == 0){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k+2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k+1);
+		}
+		if(k == 6){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k-2);
+		}
+		if(k == 7){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+2, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k-2);
+		}
+	}
+	
+	if(j == 6){
+		if(k > 1 && k < 6){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k-2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k-2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k+2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k+2);
+		}
+		if(k == 1){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k+2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k+2);
+		}
+		if(k == 0){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k+2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k+2);
+		}
+		if(k == 6){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k-2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k-2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k+1);
+		}
+		if(k == 7){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j+1, k-2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k-2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k-1);
+		}
+	}
+	
+	if(j == 7){
+		if(k > 1 && k < 6){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k-2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k+2);
+		}
+		if(k == 1){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k+2);
+		}
+		if(k == 0){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k+2);
+		}
+		if(k == 6){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k-2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k+1);
+		}
+		if(k == 7){
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-1, k-2);
+			atacantes += pecaAdversariaPresente(tabuleiro, CAVALO, oponente, j-2, k-1);
+		}
+	}
+	
+	if(atacantes > 0){
+		return TRUE;
+	}
+	else{
+		return FALSE;
+	}
+}
+
+int ameacadaPorDama(peca tabuleiro[ORDEM][ORDEM], int j, int k){
+	if(ameacadaPor_4Direcoes(tabuleiro, DAMA, j, k) == TRUE){
+		return TRUE;
+	}
+	if(ameacadaPor_4Diagonais(tabuleiro, DAMA, j, k) == TRUE){
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+int ameacadaPorRei(peca tabuleiro[ORDEM][ORDEM], int j, int k){
+	char oponente = verifOponente(tabuleiro[j][k].jogador);
+	int atacantes = 0;
+	
+	if(j > 0 && j < 7){
+		if(k > 0 && k < 7){
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j-1, k);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j-1, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j+1, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j+1, k);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j+1, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j-1, k-1);
+		}
+		if(k == 0){
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j-1, k);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j-1, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j+1, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j+1, k);
+		}
+		if(k == 7){
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j+1, k);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j+1, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j-1, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j-1, k);
+		}
+	}
+	
+	if(j == 0){
+		if(k > 0 && k < 7){
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j+1, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j+1, k);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j+1, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j, k-1);
+		}
+		if(k == 0){
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j+1, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j+1, k);
+		}
+		if(k == 7){
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j+1, k);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j+1, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j, k-1);
+		}
+	}
+	
+	if(j == 7){
+		if(k > 0 && k < 7){
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j-1, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j-1, k);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j-1, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j, k+1);
+		}
+		if(k == 0){
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j-1, k);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j-1, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j, k+1);
+		}
+		if(k == 7){
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j-1, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, REI, oponente, j-1, k);
+		}
+	}
+	
+	if(atacantes > 0){
+		return TRUE;
+	}
+	else{
+		return FALSE;
+	}
+}
+
+int ameacadaPorPeao(peca tabuleiro[ORDEM][ORDEM], int j, int k){
+	char oponente = verifOponente(tabuleiro[j][k].jogador);
+	int atacantes = 0;
+	
+	if(tabuleiro[j][k].jogador == '1'){
+		if(j == 0){
+			return FALSE;
+		}
+		else{
+			atacantes += pecaAdversariaPresente(tabuleiro, PEAO, oponente, j-1, k-1);
+			atacantes += pecaAdversariaPresente(tabuleiro, PEAO, oponente, j-1, k+1);
+		}
+	}
+	
+	if(tabuleiro[j][k].jogador == '2'){
+		if(j == ORDEM-1){
+			return FALSE;
+		}
+		else{
+			atacantes += pecaAdversariaPresente(tabuleiro, PEAO, oponente, j+1, k+1);
+			atacantes += pecaAdversariaPresente(tabuleiro, PEAO, oponente, j+1, k-1);
+		}
+	}
+	
+	if(atacantes > 0){
+		return TRUE;
+	}
+	else{
+		return FALSE;
+	}
+}
+
 int emXeque(peca tabuleiro[ORDEM][ORDEM], int ender[TAM_ENDER]){
 	int j = ender[0];
 	int k = ender[1];
 	
-	//Em xeque por torre
+	if(ameacadaPorTorre(tabuleiro, j, k) == TRUE){
+		return TRUE;
+	}
+	if(ameacadaPorBispo(tabuleiro, j, k) == TRUE){
+		return TRUE;
+	}
+	if(ameacadaPorCavalo(tabuleiro, j, k) == TRUE){
+		return TRUE;
+	}
+	if(ameacadaPorDama(tabuleiro, j, k) == TRUE){
+		return TRUE;
+	}
+	if(ameacadaPorRei(tabuleiro, j, k) == TRUE){
+		return TRUE;
+	}
+	if(ameacadaPorPeao(tabuleiro, j, k) == TRUE){
+		return TRUE;
+	}
 	
-	
-	int perc;
-	for(perc = j-1; perc >= 0; perc--){
-		if(tabuleiro[perc][k].nome == TORRE){
-			if(movVertiDisponivel(tabuleiro, k, j, perc) == TRUE){
-				return TRUE;
-			}
-		}
-	}
-	for(perc = k+1; perc <= 7; perc++){
-		if(tabuleiro[j][perc].nome == TORRE){
-			if(movHorizDisponivel(tabuleiro, j, perc, k) == TRUE){
-				return TRUE;
-			}
-		}
-	}
-	for(perc = j+1; perc <= 7; perc++){
-		if(tabuleiro[perc][k].nome == TORRE){
-			if(movVertiDisponivel(tabuleiro, k, perc, j) == TRUE){
-				return TRUE;
-			}
-		}
-	}
-	for(perc = k-1; perc >= 0; perc--){
-		if(tabuleiro[j][perc].nome == TORRE){
-			if(movHorizDisponivel(tabuleiro, j, k, perc) == TRUE){
-				return TRUE;
-			}
-		}
-	}
+	return FALSE;
 }
 
 int roque(peca tabuleiro[ORDEM][ORDEM], int enderPartida[TAM_ENDER], int enderChegada[TAM_ENDER]){
@@ -1427,7 +1841,10 @@ void main(){
 	char jogador2[TAM_NICKNAME];
 	
 	/*Testar funções*/
-	printf("%d\n",ameacadaPorTorre(tabuleiro, '1', 4, 4));
+	int ender[TAM_ENDER];
+	ender[0] = 3;
+	ender[1] = 3;
+	printf("%d\n",emXeque(tabuleiro, ender));
 	
 	/*
 	printf("Informe seu nickname, jogador 1 (de 1 a 10 caracteres e sem espaco): ");
