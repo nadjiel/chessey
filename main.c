@@ -1,6 +1,6 @@
 /*
 
-Fazer os eventos especiais, tipo xeque, roque, xeque-mate, captura-en-passent
+Fazer os eventos especiais, tipo xeque, roque, xeque-mate
 
 Melhorar movHorizDisponivel()
 Melhorar movVertiDisponivel()
@@ -17,6 +17,7 @@ typedef struct tipoPeca{
 	int jogadas;
 }peca;
 
+const int NENHUM = -1;
 const int ERRO = -1;
 const int FALSE = 0;
 const int TRUE = 1;
@@ -36,7 +37,31 @@ const char DAMA = 'D';
 const char REI = 'R';
 
 void iniciarTabuleiro(peca tabuleiro[ORDEM][ORDEM]){
+	int j, k;
+	for(j = 0; j < ORDEM; j++){
+		for(k = 0; k < ORDEM; k++){
+			tabuleiro[j][k].nome = VAZIO;
+			tabuleiro[j][k].jogador = VAZIO;
+			tabuleiro[j][k].jogadas = 0;
+		}
+	}
+	tabuleiro[1][0].nome = PEAO;
+	tabuleiro[1][0].jogador = '1';
+	tabuleiro[1][0].jogadas = 0;
 	
+	tabuleiro[2][0].nome = DAMA;
+	tabuleiro[2][0].jogador = '1';
+	tabuleiro[2][0].jogadas = 0;
+	
+	tabuleiro[1][1].nome = PEAO;
+	tabuleiro[1][1].jogador = '2';
+	tabuleiro[1][1].jogadas = 0;
+	
+	tabuleiro[3][2].nome = PEAO;
+	tabuleiro[3][2].jogador = '1';
+	tabuleiro[3][2].jogadas = 0;
+	
+	/*
 	tabuleiro[0][0].nome = TORRE;
 	tabuleiro[0][7].nome = TORRE;
 	tabuleiro[7][0].nome = TORRE;
@@ -88,6 +113,7 @@ void iniciarTabuleiro(peca tabuleiro[ORDEM][ORDEM]){
 			tabuleiro[j][k].jogadas = 0;
 		}
 	}
+	*/
 }
 
 int coordCharPraCoordInt(char coord){
@@ -226,7 +252,7 @@ int movHorizDisponivel(peca tabuleiro[ORDEM][ORDEM], int j, int kMaior, int kMen
 	int percorrer;
 	int contPecas = 0;
 	for(percorrer = kMenor+1; percorrer < kMaior; percorrer++){
-		if((tabuleiro[j][percorrer].jogador == '1') || (tabuleiro[j][percorrer].jogador == '2')){
+		if(tabuleiro[j][percorrer].jogador != VAZIO){
 			contPecas++;
 		}
 	}
@@ -937,7 +963,41 @@ int verifPecaLivre(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAM_ENDER],
 	}
 }
 
-int verifMovDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TAM_ENDER], int enderChegada[TAM_ENDER], char pecaEscolhida){
+int capturaEnPassant(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartidaAnt[TAM_ENDER], int enderChegadaAnt[TAM_ENDER], int enderPartida[TAM_ENDER], int enderChegada[TAM_ENDER]){
+	int j1Ant = enderPartidaAnt[0];
+	int k1Ant = enderPartidaAnt[1];
+	int j2Ant = enderChegadaAnt[0];
+	int k2Ant = enderChegadaAnt[1];
+	
+	int j1 = enderPartida[0];
+	int k1 = enderPartida[1];
+	int j2 = enderChegada[0];
+	int k2 = enderChegada[1];
+	
+	if(vez == '1'){
+		if((j2 == j1-1 && k2 == k1-1) || (j2 == j1-1 && k2 == k1+1)){
+			if((tabuleiro[j2][k2].jogador == VAZIO) && (tabuleiro[j2+1][k2].nome == PEAO)){
+				if((j1Ant == j2-1 && k1Ant == k2) && (j2Ant == j2+1 && k2Ant == k2)){
+					return TRUE;
+				}
+			}
+		}
+	}
+	
+	if(vez == '2'){
+		if((j2 == j1+1 && k2 == k1-1) || (j2 == j1+1 && k2 == k1+1)){
+			if((tabuleiro[j2][k2].jogador == VAZIO) && (tabuleiro[j2-1][k2].nome == PEAO)){
+				if((j1Ant == j2+1 && k1Ant == k2) && (j2Ant == j2-1 && k2Ant == k2)){
+					return TRUE;
+				}
+			}
+		}
+	}
+	
+	return FALSE;
+}
+
+int verifMovDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartidaAnt[TAM_ENDER], int enderChegadaAnt[TAM_ENDER], int enderPartida[TAM_ENDER], int enderChegada[TAM_ENDER], char pecaEscolhida){
 	if(pecaEscolhida == TORRE){
 		if(movDisponivel_4Direcoes(tabuleiro, enderPartida, enderChegada) == FALSE){
 			return FALSE;
@@ -979,16 +1039,17 @@ int verifMovDisponivel(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[
 		}
 	}
 	if(pecaEscolhida == PEAO){
-		if(movDisponivel_Peao(tabuleiro, vez, enderPartida, enderChegada) == FALSE){
-			return FALSE;
-		}
-		else{
+		if(movDisponivel_Peao(tabuleiro, vez, enderPartida, enderChegada) == TRUE){
 			return TRUE;
 		}
+		if(capturaEnPassant(tabuleiro, vez, enderPartidaAnt, enderChegadaAnt, enderPartida, enderChegada) == TRUE){
+			return TRUE;
+		}
+		return FALSE;
 	}
 }
 
-void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TAM_ENDER], int enderChegada[TAM_ENDER]){
+void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartidaAnt[TAM_ENDER], int enderChegadaAnt[TAM_ENDER], int enderPartida[TAM_ENDER], int enderChegada[TAM_ENDER]){
 	char casaPartida[TAM_CASA];
 	printf("\nQual peca voce quer mexer? ");
 	lerCasa(casaPartida);
@@ -1010,21 +1071,39 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 	lerCasa(casaChegada);
 	caixaBaixa(casaChegada);
 	casaPraEnder(casaChegada, enderChegada);
-	int movDisponivel = verifMovDisponivel(tabuleiro, vez, enderPartida, enderChegada, pecaEscolhida);
+	int movDisponivel = verifMovDisponivel(tabuleiro, vez, enderPartidaAnt, enderChegadaAnt, enderPartida, enderChegada, pecaEscolhida);
 	while((enderDisponivel(tabuleiro, vez, enderChegada, CHEGADA) == FALSE) || (movDisponivel == FALSE)){
 		printf("Coordenada invalida. Digite outra: ");
 		lerCasa(casaChegada);
 		caixaBaixa(casaChegada);
 		casaPraEnder(casaChegada, enderChegada);
-		movDisponivel = verifMovDisponivel(tabuleiro, vez, enderPartida, enderChegada, pecaEscolhida);
+		movDisponivel = verifMovDisponivel(tabuleiro, vez, enderPartidaAnt, enderChegadaAnt, enderPartida, enderChegada, pecaEscolhida);
 	}
 }
 
-void efetuarJogada(peca tabuleiro[ORDEM][ORDEM], int enderPartida[TAM_ENDER], int enderChegada[TAM_ENDER]){
+void efetuarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartidaAnt[TAM_ENDER], int enderChegadaAnt[TAM_ENDER], int enderPartida[TAM_ENDER], int enderChegada[TAM_ENDER]){
 	int j1 = enderPartida[0];
 	int k1 = enderPartida[1];
 	int j2 = enderChegada[0];
 	int k2 = enderChegada[1];
+	
+	if(capturaEnPassant(tabuleiro, vez, enderPartidaAnt, enderChegadaAnt, enderPartida, enderChegada) == TRUE){
+		if(vez == '1'){
+			tabuleiro[j2+1][k2].nome = VAZIO;
+			tabuleiro[j2+1][k2].jogador = VAZIO;
+			tabuleiro[j2+1][k2].jogadas = 0;
+		}
+		if(vez == '2'){
+			tabuleiro[j2-1][k2].nome = VAZIO;
+			tabuleiro[j2-1][k2].jogador = VAZIO;
+			tabuleiro[j2-1][k2].jogadas = 0;
+		}
+	}
+	
+	enderPartidaAnt[0] = enderPartida[0];
+	enderPartidaAnt[1] = enderPartida[1];
+	enderChegadaAnt[0] = enderChegada[0];
+	enderChegadaAnt[1] = enderChegada[1];
 	
 	tabuleiro[j2][k2] = tabuleiro[j1][k1];
 	tabuleiro[j2][k2].jogadas++;
@@ -1033,12 +1112,12 @@ void efetuarJogada(peca tabuleiro[ORDEM][ORDEM], int enderPartida[TAM_ENDER], in
 	tabuleiro[j1][k1].jogadas = 0;
 }
 
-void efetuarTurno(peca tabuleiro[ORDEM][ORDEM], char vez){
+void efetuarTurno(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartidaAnt[TAM_ENDER], int enderChegadaAnt[TAM_ENDER]){
 	int enderPartida[TAM_ENDER];
 	int enderChegada[TAM_ENDER];
 	
-	perguntarJogada(tabuleiro, vez, enderPartida, enderChegada);
-	efetuarJogada(tabuleiro, enderPartida, enderChegada);
+	perguntarJogada(tabuleiro, vez, enderPartidaAnt, enderChegadaAnt, enderPartida, enderChegada);
+	efetuarJogada(tabuleiro, vez, enderPartidaAnt, enderChegadaAnt, enderPartida, enderChegada);
 }
 
 int xequeMate(peca tabuleiro[ORDEM][ORDEM]){
@@ -1132,6 +1211,12 @@ void promoverPeao(peca tabuleiro[ORDEM][ORDEM]){
 void main(){
 	peca tabuleiro[ORDEM][ORDEM];
 	iniciarTabuleiro(tabuleiro);
+	int enderPartidaAnt[TAM_ENDER];
+	enderPartidaAnt[0] = NENHUM;
+	enderPartidaAnt[1] = NENHUM;
+	int enderChegadaAnt[TAM_ENDER];
+	enderChegadaAnt[0] = NENHUM;
+	enderChegadaAnt[1] = NENHUM;
 	int turno = 0;
 	char vez;
 	char vencedor;
@@ -1161,7 +1246,7 @@ void main(){
 		}
 		
 		if(vencedor == VAZIO){
-			efetuarTurno(tabuleiro, vez);
+			efetuarTurno(tabuleiro, vez, enderPartidaAnt, enderChegadaAnt);
 		}
 	}while(vencedor == VAZIO);
 	
