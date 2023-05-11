@@ -1,6 +1,6 @@
 /*
 
-Fazer os eventos especiais, tipo xeque, roque, promocao, xeque-mate, captura-en-passent
+Fazer os eventos especiais, tipo xeque, roque, xeque-mate, captura-en-passent
 
 Melhorar movHorizDisponivel()
 Melhorar movVertiDisponivel()
@@ -1077,6 +1077,58 @@ char verifVencedor(peca tabuleiro[ORDEM][ORDEM]){
 	return VAZIO;
 }
 
+void lerPeca(char *peca){
+	fflush(stdin);
+	scanf("%c",&(*peca));
+}
+
+int pecaValida(char peca){
+	switch(peca){
+		case 't': return TRUE;
+		case 'c': return TRUE;
+		case 'b': return TRUE;
+		case 'D': return TRUE;
+		default: return FALSE;
+	}
+}
+
+int peaoPromovivel(peca tabuleiro[ORDEM][ORDEM]){
+	int k;
+	for(k = 0; k < ORDEM; k++){
+		if(tabuleiro[0][k].nome == PEAO){
+			return TRUE;
+		}
+		if(tabuleiro[7][k].nome == PEAO){
+			return TRUE;
+		}
+	}
+	
+	return FALSE;
+}
+
+void promoverPeao(peca tabuleiro[ORDEM][ORDEM]){
+	char peca;
+	int k;
+	
+	if(peaoPromovivel(tabuleiro) == TRUE){
+		printf("\nPara que peca deseja promover seu peao? ");
+		lerPeca(&peca);
+		while(pecaValida(peca) == FALSE){
+			printf("Peca invalida. Digite outra: ");
+			lerPeca(&peca);
+		}
+		
+		for(k = 0; k < ORDEM; k++){
+			if(tabuleiro[0][k].nome == PEAO){
+				tabuleiro[0][k].nome = peca;
+			}
+			if(tabuleiro[7][k].nome == PEAO){
+				tabuleiro[0][k].nome = peca;
+			}
+		}
+	}
+}
+
 void main(){
 	peca tabuleiro[ORDEM][ORDEM];
 	iniciarTabuleiro(tabuleiro);
@@ -1093,6 +1145,8 @@ void main(){
 	lerNickname(jogador2);
 	
 	do{
+		promoverPeao(tabuleiro);
+		
 		turno++;
 		vez = verifVez(turno);
 		
