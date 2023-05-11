@@ -530,6 +530,165 @@ int pecaLivre_4Diagonais(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAM_E
 	}
 }
 
+int pecaLivre_8Ls(peca tabuleiro[ORDEM][ORDEM], char vez, int ender[TAM_ENDER]){
+	int j = ender[0];
+	int k = ender[1];
+	int obstaculos = 0;
+	
+	if((j > 1 && j < 6) && (k > 1 && k < 6)){
+		obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k-1);
+		obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k+1);
+		obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k+2);
+		obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k+2);
+		obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k+1);
+		obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k-1);
+		obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k-2);
+		obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k-2);
+	}
+	
+	if(j == 1){
+		obstaculos += 2;
+		if(k > 1 && k < 6){
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k+2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k+2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k+1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k-1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k-2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k-2);
+		}
+		if(k == 1){
+			obstaculos += 2;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k+2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k+2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k+1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k-1);
+		}
+		if(k == 0){
+			obstaculos += 3;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k+2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k+2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k+1);
+		}
+		if(k == 6){
+			obstaculos += 2;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k+1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k-1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k-2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k-2);
+		}
+		if(k == 7){
+			obstaculos += 3;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k-1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k-2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k-2);
+		}
+	}
+	
+	if(j == 0){
+		obstaculos += 4;
+		if(k > 1 && k < 6){
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k+2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k+1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k-1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k-2);
+		}
+		if(k == 1){
+			obstaculos += 1;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k+2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k+1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k-1);
+		}
+		if(k == 0){
+			obstaculos += 2;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k+2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k+1);
+		}
+		if(k == 6){
+			obstaculos += 1;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k+1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k-1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k-2);
+		}
+		if(k == 7){
+			obstaculos += 2;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+2, k-1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k-2);
+		}
+	}
+	
+	if(j == 6){
+		obstaculos += 2;
+		if(k > 1 && k < 6){
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k-2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k-2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k-1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k+1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k+2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k+2);
+		}
+		if(k == 1){
+			obstaculos += 2;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k-1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k+1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k+2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k+2);
+		}
+		if(k == 0){
+			obstaculos += 3;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k+1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k+2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k+2);
+		}
+		if(k == 6){
+			obstaculos += 2;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k-2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k-2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k-1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k+1);
+		}
+		if(k == 7){
+			obstaculos += 3;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j+1, k-2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k-2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k-1);
+		}
+	}
+	
+	if(j == 7){
+		obstaculos += 4;
+		if(k > 1 && k < 6){
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k-2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k-1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k+1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k+2);
+		}
+		if(k == 1){
+			obstaculos += 1;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k-1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k+1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k+2);
+		}
+		if(k == 0){
+			obstaculos += 2;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k+1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k+2);
+		}
+		if(k == 6){
+			obstaculos += 1;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k-2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k-1);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k+1);
+		}
+		if(k == 7){
+			obstaculos += 2;
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-1, k-2);
+			obstaculos += pecaDaVezPresente(tabuleiro, vez, j-2, k-1);
+		}
+	}
+	
+	
+}
+
 void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TAM_ENDER], int enderChegada[TAM_ENDER]){
 	char casaPartida[TAM_CASA];
 	printf("\nQual peca voce quer mexer? ");
