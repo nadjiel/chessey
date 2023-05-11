@@ -1833,6 +1833,14 @@ void main(){
 		}
 		
 		if(vencedor == VAZIO){
+			switch(vez){
+				case '1': printf("\nVez de %s\n",jogador1);
+						  break;
+				case '2': printf("\nVez de %s\n",jogador2);
+			}
+		}
+		
+		if(vencedor == VAZIO){
 			efetuarTurno(tabuleiro, vez, enderPartidaAnt, enderChegadaAnt);
 		}
 	}while(vencedor == VAZIO);
