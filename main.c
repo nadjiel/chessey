@@ -1,6 +1,6 @@
 /*
 Atualizar turno fazendo o loop principal
-Continuar trabalhando no procedimento perguntarJogada()
+Continuar trabalhando no procedimento perguntarJogada() e função da linha 231
 Fazer casos nos quais outras pecas foram escolhidas
 Fazer os eventos especiais, tipo xeque, roque
 */
@@ -125,19 +125,12 @@ void lerNickname(char nickname[TAMANHO_NICKNAME]){
 	scanf("%s",nickname);
 }
 
-int verifVez(int turno){
+char verifVez(int turno){
 	if(turno % 2 == 1){
-		return 1;
+		return '1';
 	}
 	else{
-		return 2;
-	}
-}
-
-char vezIntPraVezChar(int vez){
-	switch(vez){
-		case 1: return '1';
-		case 2: return '2';
+		return '2';
 	}
 }
 
@@ -149,8 +142,8 @@ int casaPartidaDisponivel(peca tabuleiro[ORDEM][ORDEM], int turno, char casa[TAM
 		return FALSE;
 	}
 	else{
-		int vez = verifVez(turno);
-		if(tabuleiro[j-1][k-1].jogador == vezIntPraVezChar(vez)){
+		char vez = verifVez(turno);
+		if(tabuleiro[j-1][k-1].jogador == vez){
 			return TRUE;
 		}
 		else{
@@ -167,8 +160,8 @@ int casaChegadaDisponivel(peca tabuleiro[ORDEM][ORDEM], int turno, char casa[TAM
 		return FALSE;
 	}
 	else{
-		int vez = verifVez(turno);
-		if(tabuleiro[j-1][k-1].jogador != vezIntPraVezChar(vez)){
+		char vez = verifVez(turno);
+		if(tabuleiro[j-1][k-1].jogador != vez){
 			return TRUE;
 		}
 		else{
@@ -228,17 +221,40 @@ int movimentoDisponivelTorre(peca tabuleiro[ORDEM][ORDEM], char casaPartida[TAMA
 	return TRUE;
 }
 
+/*
+int verifTorreLivre(peca tabuleiro[ORDEM][ORDEM], char casaPartida[TAMANHO_CASA], int turno){
+	
+}
+*/
+
 void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], int turno){
 	char casaPartida[TAMANHO_CASA];
 	fflush(stdin);
-	printf("\nDigite a coordenada da casa na qual estah a peca que voce quer mexer: ");
+	printf("\nQual peca voce quer mexer: ");
 	scanf("%s",casaPartida);
-	while(casaPartidaDisponivel(tabuleiro, turno, casaPartida) == FALSE){
-		fflush(stdin);
-		printf("Coordenada invalida. Digite outra: ");
-		scanf("%s",casaPartida);
-	}
-	char pecaEscolhida = verifPeca(tabuleiro, casaPartida);
+	int pecaLivre;
+	char pecaEscolhida;
+	do{
+		while(casaPartidaDisponivel(tabuleiro, turno, casaPartida) == FALSE){
+			fflush(stdin);
+			printf("Coordenada invalida. Digite outra: ");
+			scanf("%s",casaPartida);
+		}
+		pecaEscolhida = verifPeca(tabuleiro, casaPartida);
+		/*
+		if(pecaEscolhida == TORRE){
+			if(verifTorreLivre == FALSE){
+				pecaLivre = FALSE;
+			}
+			else{
+				pecaLivre = TRUE;
+			}
+		}
+		*/
+		
+		
+	}while(pecaLivre == FALSE);
+	
 	char casaChegada[TAMANHO_CASA];
 	fflush(stdin);
 	printf("\nPara qual casa voce quer mecher essa peca? ");
