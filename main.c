@@ -1,8 +1,8 @@
 /*
 Atualizar turno fazendo o loop principal
-Perguntar onde deseja mover a peca
-Ajustar comparacoes de ints com o campo .jogador do registro, que eh char
 Continuar trabalhando no procedimento perguntarJogada()
+Fazer casos nos quais outras pecas foram escolhidas
+Fazer os eventos especiais, tipo xeque, roque
 */
 
 #include<stdio.h>
@@ -10,6 +10,7 @@ Continuar trabalhando no procedimento perguntarJogada()
 typedef struct tipoPeca{
 	char nome;
 	char jogador;
+	int jogadas;
 }peca;
 
 const int ERRO = 0;
@@ -25,10 +26,6 @@ const char BISPO = 'b';
 const char PEAO = 'p';
 const char DAMA = 'D';
 const char REI = 'R';
-const char NORTE = 'n';
-const char SUL = 's';
-const char LESTE = 'l';
-const char OESTE = 'o';
 
 void iniciarTabuleiro(peca tabuleiro[ORDEM][ORDEM]){
 	tabuleiro[0][0].nome = TORRE;
@@ -76,18 +73,11 @@ void iniciarTabuleiro(peca tabuleiro[ORDEM][ORDEM]){
 			tabuleiro[j][k].jogador = '1';
 		}
 	}
-}
-
-char coordNumPraCoordLetra(int coord){
-	switch(coord){
-		case 1: return 'a';
-		case 2: return 'b';
-		case 3: return 'c';
-		case 4: return 'd';
-		case 5: return 'e';
-		case 6: return 'f';
-		case 7: return 'g';
-		case 8: return 'h';
+	
+	for(j = 0; j < ORDEM; j++){
+		for(k = 0; k < ORDEM; k++){
+			tabuleiro[j][k].jogadas = 0;
+		}
 	}
 }
 
@@ -115,14 +105,9 @@ int coordCharPraCoordInt(char coord){
 
 void imprimirTabuleiro(peca tabuleiro[ORDEM][ORDEM]){
 	int j, k;
-	int cont = 0;
-	printf("    ");
-	for(k = 0; k < ORDEM; k++){
-		cont++;
-		printf("%c  ",coordNumPraCoordLetra(cont));
-	}
+	printf("    a  b  c  d  e  f  g  h");
 	printf("\n\n");
-	cont = 0;
+	int cont = 0;
 	for(j = 0; j < ORDEM; j++){
 		cont++;
 		printf("%d   ",cont);
@@ -149,16 +134,41 @@ int verifVez(int turno){
 	}
 }
 
-int casaDisponivel(peca tabuleiro[ORDEM][ORDEM], int turno, char casa[TAMANHO_CASA]){
+char vezIntPraVezChar(int vez){
+	switch(vez){
+		case 1: return '1';
+		case 2: return '2';
+	}
+}
+
+int casaPartidaDisponivel(peca tabuleiro[ORDEM][ORDEM], int turno, char casa[TAMANHO_CASA]){
 	int j, k;
-	j = coordCharPraCoordInt(casa[0]);
-	k = coordCharPraCoordInt(casa[1]);
+	j = coordCharPraCoordInt(casa[1]);
+	k = coordCharPraCoordInt(casa[0]);
 	if(j == ERRO || k == ERRO){
 		return FALSE;
 	}
 	else{
 		int vez = verifVez(turno);
-		if(tabuleiro[j-1][k-1].jogador == vez){
+		if(tabuleiro[j-1][k-1].jogador == vezIntPraVezChar(vez)){
+			return TRUE;
+		}
+		else{
+			return FALSE;
+		}
+	}
+}
+
+int casaChegadaDisponivel(peca tabuleiro[ORDEM][ORDEM], int turno, char casa[TAMANHO_CASA]){
+	int j, k;
+	j = coordCharPraCoordInt(casa[1]);
+	k = coordCharPraCoordInt(casa[0]);
+	if(j == ERRO || k == ERRO){
+		return FALSE;
+	}
+	else{
+		int vez = verifVez(turno);
+		if(tabuleiro[j-1][k-1].jogador != vezIntPraVezChar(vez)){
 			return TRUE;
 		}
 		else{
@@ -168,74 +178,90 @@ int casaDisponivel(peca tabuleiro[ORDEM][ORDEM], int turno, char casa[TAMANHO_CA
 }
 
 char verifPeca(peca tabuleiro[ORDEM][ORDEM], char casa[TAMANHO_CASA]){
-	int j = coordCharPraCoordInt(casa[0]) - 1;
-	int k = coordCharPraCoordInt(casa[1]) - 1;
+	int j = coordCharPraCoordInt(casa[1]) - 1;
+	int k = coordCharPraCoordInt(casa[0]) - 1;
 	return tabuleiro[j][k].nome;
 }
 
-int direcaoDisponivelTorre(peca tabuleiro[ORDEM][ORDEM], int turno, char casa[TAMANHO_CASA], char direcao){
-	int j = coordCharPraCoordInt(casa[0]) - 1;
-	int k = coordCharPraCoordInt(casa[1]) - 1;
-	int vez = verifVez(turno);
-	if((direcao != NORTE) || (direcao != SUL) || (direcao != LESTE) || (direcao != OESTE)){
+int movimentoDisponivelTorre(peca tabuleiro[ORDEM][ORDEM], char casaPartida[TAMANHO_CASA], char casaChegada[TAMANHO_CASA]){
+	if((casaPartida[0] != casaChegada[0]) && (casaPartida[1] != casaChegada[1])){
 		return FALSE;
 	}
-	else{
-		if((j == 0 || j == 7) || (k == 0 || k == 7)){
-			if(direcao == NORTE && j == 0){
-				return FALSE;
+	if(casaPartida[0] == casaChegada[0]){
+		int jInicial = coordCharPraCoordInt(casaPartida[1]) - 1;
+		int jFinal = coordCharPraCoordInt(casaChegada[1]) - 1;
+		int k = coordCharPraCoordInt(casaPartida[0]) - 1;
+		if(jInicial > jFinal){
+			for(jInicial++; jInicial > jFinal; jInicial--){
+				if((tabuleiro[jInicial][k].jogador == '1') || (tabuleiro[jInicial][k].jogador == '2')){
+					return FALSE;
+				}
 			}
-			else if(direcao == SUL && j == 7){
-					 return FALSE;
-				 }
-				 else if(direcao == LESTE && k == 7){
-						  return FALSE;
-					  }
-					  else if(direcao == OESTE && k == 0){
-							   return FALSE;
-						   }
 		}
-		if(direcao == NORTE && tabuleiro[j-1][k].jogador == vez){
-			return FALSE;
+		if(jInicial < jFinal){
+			for(jInicial++; jInicial < jFinal; jInicial++){
+				if((tabuleiro[jInicial][k].jogador == '1') || (tabuleiro[jInicial][k].jogador == '2')){
+					return FALSE;
+				}
+			}
 		}
-		else if(direcao == SUL && tabuleiro[j+1][k].jogador == vez){
-				 return FALSE;
-			 }
-			 else if(direcao == LESTE && tabuleiro[j][k+1].jogador == vez){
-					  return FALSE;
-				  }
-				  else if(direcao == OESTE && tabuleiro[j][k-1].jogador == vez){
-						   return FALSE;
-					   }
-					   else{
-					   	return TRUE;
-					   }
 	}
+	if(casaPartida[1] == casaChegada[1]){
+		int kInicial = coordCharPraCoordInt(casaPartida[0]) - 1;
+		int kFinal = coordCharPraCoordInt(casaChegada[0]) - 1;
+		int j = coordCharPraCoordInt(casaPartida[1]) - 1;
+		if(kInicial > kFinal){
+			for(kInicial++; kInicial > kFinal; kInicial--){
+				if((tabuleiro[j][kInicial].jogador == '1') || (tabuleiro[j][kInicial].jogador == '2')){
+					return FALSE;
+				}
+			}
+		}
+		if(kInicial < kFinal){
+			for(kInicial++; kInicial < kFinal; kInicial++){
+				if((tabuleiro[j][kInicial].jogador == '1') || (tabuleiro[j][kInicial].jogador == '2')){
+					return FALSE;
+				}
+			}
+		}
+	}
+	return TRUE;
 }
 
 void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], int turno){
-	char casa[TAMANHO_CASA];
+	char casaPartida[TAMANHO_CASA];
 	fflush(stdin);
 	printf("\nDigite a coordenada da casa na qual estah a peca que voce quer mexer: ");
-	scanf("%s",casa);
-	while(casaDisponivel(tabuleiro, turno, casa) == FALSE){
+	scanf("%s",casaPartida);
+	while(casaPartidaDisponivel(tabuleiro, turno, casaPartida) == FALSE){
 		fflush(stdin);
 		printf("Coordenada invalida. Digite outra: ");
-		scanf("%s",casa);
+		scanf("%s",casaPartida);
 	}
-	char pecaEscolhida = verifPeca(tabuleiro, casa);
-	char direcao;
-	if(pecaEscolhida == TORRE){
-		fflush(stdin);
-		printf("\nPara que direcao voce quer mover a peca? (n, s, l ou o) ");
-		scanf("%c",&direcao);
-		while(direcaoDisponivelTorre(tabuleiro, turno, casa, direcao) == FALSE){
+	char pecaEscolhida = verifPeca(tabuleiro, casaPartida);
+	char casaChegada[TAMANHO_CASA];
+	fflush(stdin);
+	printf("\nPara qual casa voce quer mecher essa peca? ");
+	scanf("%s",casaChegada);
+	int movimentoDisponivel;
+	do{
+		while(casaChegadaDisponivel(tabuleiro, turno, casaChegada) == FALSE){
 			fflush(stdin);
-			printf("Direcao invalida. Informe uma direcao entre n, s, l e o: ");
-			scanf("%c",&direcao);
+			printf("Coordenada invalida. Digite outra: ");
+			scanf("%s",casaChegada);
 		}
-	}
-	
+		if(pecaEscolhida == TORRE){
+			if(movimentoDisponivelTorre(tabuleiro, casaPartida, casaChegada) == FALSE){
+				movimentoDisponivel = FALSE;
+			}
+			else{
+				movimentoDisponivel = TRUE;
+			}
+		}
+		
+		
+		
+	}while(movimentoDisponivel == FALSE);
 }
 
 void main(){
@@ -246,10 +272,11 @@ void main(){
 	char jogador2[TAMANHO_NICKNAME];
 	lerNickname(jogador1);
 	printf("\n");
-	lerNickname(jogador1);
+	lerNickname(jogador2);
 	printf("\n\n");
 	int turno = 1;
 	imprimirTabuleiro(tabuleiro);
+	perguntarJogada(tabuleiro, turno);
 	
 	getch();
 }
