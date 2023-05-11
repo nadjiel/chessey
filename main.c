@@ -1532,10 +1532,7 @@ int ameacadaPorPeao(peca tabuleiro[ORDEM][ORDEM], int j, int k){
 	}
 }
 
-int emXeque(peca tabuleiro[ORDEM][ORDEM], int ender[TAM_ENDER]){
-	int j = ender[0];
-	int k = ender[1];
-	
+int emXeque(peca tabuleiro[ORDEM][ORDEM], int j, int k){
 	if(ameacadaPorTorre(tabuleiro, j, k) == TRUE){
 		return TRUE;
 	}
@@ -1566,12 +1563,36 @@ int roque(peca tabuleiro[ORDEM][ORDEM], int enderPartida[TAM_ENDER], int enderCh
 	
 	if(tabuleiro[j1][k1].jogadas == 0){
 		if((j2 == j1 && k2 == k1+2) && (movHorizDisponivel(tabuleiro, j1, k2, k1) == TRUE)){
-			//Adicionar checagem se as casas entre o roque estão em xeque
-			return TRUE;
+			if((tabuleiro[j2][k2+1].nome == TORRE) && (tabuleiro[j2][k2+1].jogadas == 0)){
+				if(emXeque(tabuleiro, j1, k1) == TRUE){
+					return FALSE;
+				}
+				if(emXeque(tabuleiro, j2, k2-1) == TRUE){
+					return FALSE;
+				}
+				if(emXeque(tabuleiro, j2, k2) == TRUE){
+					return FALSE;
+				}
+				return TRUE;
+			}
 		}
-		if((j2 == j1 && k2 == k1-2) && (movHorizDisponivel(tabuleiro, j1, k1, k2) == TRUE)){
-			//Adicionar checagem se as casas entre o roque estão em xeque
-			return TRUE;
+		
+		if((j2 == j1 && k2 == k1-2) && (movHorizDisponivel(tabuleiro, j1, k1, k2-2) == TRUE)){
+			if((tabuleiro[j2][k2-2].nome == TORRE) && (tabuleiro[j2][k2-2].jogadas == 0)){
+				if(emXeque(tabuleiro, j1, k1) == TRUE){
+					return FALSE;
+				}
+				if(emXeque(tabuleiro, j2, k2+1) == TRUE){
+					return FALSE;
+				}
+				if(emXeque(tabuleiro, j2, k2) == TRUE){
+					return FALSE;
+				}
+				if(emXeque(tabuleiro, j2, k2-1) == TRUE){
+					return FALSE;
+				}
+				return TRUE;
+			}
 		}
 	}
 	
@@ -1841,10 +1862,7 @@ void main(){
 	char jogador2[TAM_NICKNAME];
 	
 	/*Testar funções*/
-	int ender[TAM_ENDER];
-	ender[0] = 3;
-	ender[1] = 3;
-	printf("%d\n",emXeque(tabuleiro, ender));
+	printf("%d\n",emXeque(tabuleiro, 3, 3));
 	
 	/*
 	printf("Informe seu nickname, jogador 1 (de 1 a 10 caracteres e sem espaco): ");
