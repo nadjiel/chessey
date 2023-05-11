@@ -1,15 +1,3 @@
-/*
-
-Fazer os eventos especiais, tipo xeque, roque, xeque-mate
-
-Trabalhar em roque() e emXeque()
-
-Ajeitar pecaOponentePraCima(), pra Baixo, pra Direita e pra Esquerda de modo que, ao contrário de agora,
-essas funções percorram do centro pra borda do tabuleiro, de modo a detectar a TORRE inimiga mais próxima
-da peça a ser examinada se está em cheque
-
-*/
-
 #include<stdio.h>
 
 typedef struct tipoPeca{
@@ -38,40 +26,6 @@ const char DAMA = 'D';
 const char REI = 'R';
 
 void iniciarTabuleiro(peca tabuleiro[ORDEM][ORDEM]){
-	int j, k;
-	for(j = 0; j < ORDEM; j++){
-		for(k = 0; k < ORDEM; k++){
-			tabuleiro[j][k].nome = VAZIO;
-			tabuleiro[j][k].jogador = VAZIO;
-			tabuleiro[j][k].jogadas = 0;
-		}
-	}
-	
-	tabuleiro[0][4].nome = REI;
-	tabuleiro[0][4].jogador = '2';
-	tabuleiro[0][4].jogadas = 0;
-	
-	tabuleiro[0][7].nome = TORRE;
-	tabuleiro[0][7].jogador = '2';
-	tabuleiro[0][7].jogadas = 0;
-	
-	tabuleiro[0][0].nome = TORRE;
-	tabuleiro[0][0].jogador = '2';
-	tabuleiro[0][0].jogadas = 0;
-	
-	tabuleiro[7][4].nome = REI;
-	tabuleiro[7][4].jogador = '1';
-	tabuleiro[7][4].jogadas = 0;
-	
-	tabuleiro[7][7].nome = TORRE;
-	tabuleiro[7][7].jogador = '1';
-	tabuleiro[7][7].jogadas = 0;
-	
-	tabuleiro[7][0].nome = TORRE;
-	tabuleiro[7][0].jogador = '1';
-	tabuleiro[7][0].jogadas = 0;
-	
-	/*
 	tabuleiro[0][0].nome = TORRE;
 	tabuleiro[0][7].nome = TORRE;
 	tabuleiro[7][0].nome = TORRE;
@@ -123,7 +77,6 @@ void iniciarTabuleiro(peca tabuleiro[ORDEM][ORDEM]){
 			tabuleiro[j][k].jogadas = 0;
 		}
 	}
-	*/
 }
 
 int coordCharPraCoordInt(char coord){
@@ -1821,6 +1774,23 @@ void promoverPeao(peca tabuleiro[ORDEM][ORDEM]){
 	}
 }
 
+int reiEmXeque(peca tabuleiro[ORDEM][ORDEM], char vez){
+	int j, k;
+	char oponente = verifOponente(vez);
+	
+	for(j = 0; j < ORDEM; j++){
+		for(k = 0; k < ORDEM; k++){
+			if((tabuleiro[j][k].nome == REI) && (tabuleiro[j][k].jogador == vez)){
+				if(emXeque(tabuleiro, oponente, j, k) == TRUE){
+					return TRUE;
+				}
+			}
+		}
+	}
+	
+	return FALSE;
+}
+
 void main(){
 	peca tabuleiro[ORDEM][ORDEM];
 	iniciarTabuleiro(tabuleiro);
@@ -1837,15 +1807,10 @@ void main(){
 	char jogador1[TAM_NICKNAME];
 	char jogador2[TAM_NICKNAME];
 	
-	/*Testar funções*/
-	printf("%d\n",emXeque(tabuleiro, '2', 3, 3));
-	
-	/*
 	printf("Informe seu nickname, jogador 1 (de 1 a 10 caracteres e sem espaco): ");
 	lerNickname(jogador1);
 	printf("\nInforme seu nickname, jogador 2 (de 1 a 10 caracteres e sem espaco): ");
 	lerNickname(jogador2);
-	*/
 	
 	do{
 		promoverPeao(tabuleiro);
@@ -1855,6 +1820,10 @@ void main(){
 		
 		printf("\n\n");
 		imprimirTabuleiro(tabuleiro);
+		
+		if(reiEmXeque(tabuleiro, vez) == TRUE){
+			printf("\nXEQUE!\n");
+		}
 		
 		vencedor = verifVencedor(tabuleiro);
 		switch(vencedor){
