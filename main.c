@@ -4,6 +4,13 @@ Continuar trabalhando no procedimento perguntarJogada()
 Fazer casos nos quais outras pecas foram escolhidas
 Fazer os eventos especiais, tipo xeque, roque, promocao, xeque-mate, captura-en-passent
 Corrigir erro anotado no caderno (sem aceitar algumas pecas de chegada)
+
+
+Os peões não se comportam como deviam. {
+	Vão em linha reta até o topo na sua primeira jogada.
+	Quando estão no topo eles não se mechem (o que é certo, mas falta fazer eles serem promovíveis).
+}
+
 */
 
 #include<stdio.h>
@@ -43,7 +50,16 @@ void iniciarTabuleiro(peca tabuleiro[ORDEM][ORDEM]){
 	
 	tabuleiro[0][0].nome = TORRE;
 	tabuleiro[0][0].jogador = '1';
-	tabuleiro[0][0].jogadas = 0;
+	tabuleiro[0][7].nome = BISPO;
+	tabuleiro[0][7].jogador = '1';
+	tabuleiro[7][7].nome = CAVALO;
+	tabuleiro[7][7].jogador = '1';
+	tabuleiro[3][3].nome = DAMA;
+	tabuleiro[3][3].jogador = '1';
+	tabuleiro[3][4].nome = REI;
+	tabuleiro[3][4].jogador = '1';
+	tabuleiro[7][1].nome = PEAO;
+	tabuleiro[7][1].jogador = '1';
 	
 	/*
 	tabuleiro[0][0].nome = TORRE;
@@ -243,7 +259,7 @@ int movVertiDisponivel(peca tabuleiro[ORDEM][ORDEM], int k, int jMaior, int jMen
 	int percorrer;
 	int contPecas = 0;
 	for(percorrer = jMenor+1; percorrer < jMaior; percorrer++){
-		if(tabuleiro[percorrer][k].jogador != VAZIO){
+		if((tabuleiro[percorrer][k].jogador == '1') || (tabuleiro[percorrer][k].jogador == '2')){
 			contPecas++;
 		}
 	}
@@ -928,7 +944,7 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 			pecaLivre = TRUE;
 		}
 	}
-	if(pecaEscolhida = CAVALO){
+	if(pecaEscolhida == CAVALO){
 		if(pecaLivre_8Ls(tabuleiro, vez, enderPartida) == FALSE){
 			pecaLivre = FALSE;
 		}
@@ -936,6 +952,7 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 			pecaLivre = TRUE;
 		}
 	}
+	
 	if(pecaEscolhida == DAMA || pecaEscolhida == REI){
 		if(pecaLivre_Monarcas(tabuleiro, vez, enderPartida) == FALSE){
 			pecaLivre = FALSE;
@@ -974,7 +991,8 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 				pecaLivre = TRUE;
 			}
 		}
-		if(pecaEscolhida = CAVALO){
+		
+		if(pecaEscolhida == CAVALO){
 			if(pecaLivre_8Ls(tabuleiro, vez, enderPartida) == FALSE){
 				pecaLivre = FALSE;
 			}
@@ -982,7 +1000,7 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 				pecaLivre = TRUE;
 			}
 		}
-		if(pecaEscolhida = DAMA || pecaEscolhida == REI){
+		if(pecaEscolhida == DAMA || pecaEscolhida == REI){
 			if(pecaLivre_Monarcas(tabuleiro, vez, enderPartida) == FALSE){
 				pecaLivre = FALSE;
 			}
@@ -1021,6 +1039,7 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 			movDisponivel = TRUE;
 		}
 	}
+	
 	if(pecaEscolhida == CAVALO){
 		if(movDisponivel_8Ls(enderPartida, enderChegada) == FALSE){
 			movDisponivel = FALSE;
@@ -1053,6 +1072,7 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 			movDisponivel = TRUE;
 		}
 	}
+	
 	while((enderDisponivel(tabuleiro, vez, enderChegada, CHEGADA) == FALSE) || (movDisponivel == FALSE)){
 		printf("Coordenada invalida. Digite outra: ");
 		lerCasa(casaChegada);
@@ -1073,6 +1093,7 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 				movDisponivel = TRUE;
 			}
 		}
+		
 		if(pecaEscolhida == CAVALO){
 			if(movDisponivel_8Ls(enderPartida, enderChegada) == FALSE){
 				movDisponivel = FALSE;
@@ -1081,7 +1102,7 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 				movDisponivel = TRUE;
 			}
 		}
-		if(pecaEscolhida = DAMA){
+		if(pecaEscolhida == DAMA){
 			if(movDisponivel_Dama(tabuleiro, enderPartida, enderChegada) == FALSE){
 				movDisponivel = FALSE;
 			}
@@ -1089,7 +1110,7 @@ void perguntarJogada(peca tabuleiro[ORDEM][ORDEM], char vez, int enderPartida[TA
 				movDisponivel = TRUE;
 			}
 		}
-		if(pecaEscolhida = REI){
+		if(pecaEscolhida == REI){
 			if(movDisponivel_Rei(enderPartida, enderChegada) == FALSE){
 				movDisponivel = FALSE;
 			}
