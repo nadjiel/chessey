@@ -41,7 +41,7 @@ A seguir estão descritos alguns eventos especiais que podem ocorrer no jogo e c
 - Promoção: Quando um peão chega na extremidade oposta do tabuleiro, ele poderá realizar uma promoção. O jogo perguntará em qual peça o peão deverá se transformar. Nesse momento o jogador em questão deve responder com **t** (Torre), **c** (Cavalo), **b** (Bispo) ou **D** (Dama), que são as pessas disponíveis para a promoção.
 
 ## 👇 Instalação
-Se você quiser experimentar o jogo, pode baixá-lo por meio do executável das releases do projeto aqui no Github (a [release v2.0.0](https://github.com/nadjiel/chessey/releases/tag/v2.0.0) compreende a versão completa), ou compilar o código fonte você mesmo.
+Se você quiser experimentar o jogo, pode baixar a versão 64bit para Windows por meio do executável das releases do projeto aqui no Github (a [release v2.0.0](https://github.com/nadjiel/chessey/releases/tag/v2.0.0) compreende a versão completa), ou compilar o código fonte você mesmo se estiver em outro sistema operacional.
 
 ## ✍️ Autor
 Este projeto foi desenvolvido com ❤️ por [@Nadjiel](https://github.com/nadjiel)
