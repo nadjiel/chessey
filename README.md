@@ -45,3 +45,5 @@ Se você quiser experimentar o jogo, pode baixar a versão 64bit para Windows po
 
 ## ✍️ Autor
 Este projeto foi desenvolvido com ❤️ por [@Nadjiel](https://github.com/nadjiel)
+
+## [Read in english](https://github.com/nadjiel/chessey/blob/main/readmes/README.en-us.md)
